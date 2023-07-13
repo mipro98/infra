@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# https://unix.stackexchange.com/a/228333
+set -u
+: "$BATCHNUM"
+
 # This file is the ultimate snapshot + backup + notification script for my homeserver.
 #
 # It takes care of:
@@ -47,20 +51,20 @@ SCRIPTDIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
 LOGFILE="${SCRIPTDIR}/logs/$(date +%Y%m%d_%H%M%S).log"
 LOCKFILE=/tmp/running-maintenance.lock
 
-MOUNT_BKP_DRIVE="/mnt/BACKUP"
-MOUNT_NAS="/mnt/NAS"
+MOUNT_BKP_DRIVE="{{ mount_backup_drive }}"
+MOUNT_NAS="{{ mount_nas_drive }}"
 
 # ------ These variables get filled by Ansible according to its vars: ------
 
-DOCKER_USER=  # user to execute docker-compose command
-COMPOSE_REPO=
-DOCKERDATA=
+DOCKER_USER={{ username }}  # user to execute docker-compose command
+COMPOSE_REPO="{{ docker_compose_dir }}"
+DOCKERDATA="{{ docker_data_dir }}"
 
 # --------------
 
 DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi_zusaetzliche-Backups/00_dockerdata"
 
-BTRBK_CONFIG="/etc/btrbk/btrbk.conf"
+BTRBK_CONFIG="{{ btrbk_config_dir }}"
 
 if $DRYRUN; then
     RSYNC_CMD="rsync --dry-run"
@@ -127,7 +131,7 @@ stop_containers()
 {
     # stop all docker containers
     log "stopping containers:"
-    log "$(docker ps --format '{{.Names}}')"
+    log "$(docker ps --format {% raw %}'{{.Names}}'{% endraw %})"
     docker stop "$(docker ps -q)"
 }
 
@@ -136,7 +140,7 @@ restart_containers()
     # restart docker containers
     docker start "$(docker ps -a -q)"
     log "Restarted containers:"
-    log "$(docker ps --format '{{.Names}}')"
+    log "$(docker ps --format {% raw %}'{{.Names}}'{% endraw %})"
 }
 
 # TODO: maybe let ansible construct these paths according to enabled services
@@ -145,13 +149,10 @@ docker_compose_all_services()
     log "Running docker-compose $1 on all services..."
     if ! $DRYRUN; then
         docker-compose \
-            -f "${COMPOSE_REPO}/dokuwiki/docker-compose.yml" \
-            -f "${COMPOSE_REPO}/gitea/docker-compose.yml" \
-            -f "${COMPOSE_REPO}/homer/docker-compose.yml" \
-            -f "${COMPOSE_REPO}/nextcloud/docker-compose.yml" \
-            -f "${COMPOSE_REPO}/traefik/docker-compose.yml" \
-            -f "${COMPOSE_REPO}/vaultwarden/docker-compose.yml" \
-            "$1" |& tee -a $LOGFILE
+        {% for service in docker_services %}
+        -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" \
+        {% endfor %}
+        "$1" |& tee -a $LOGFILE
     fi
 }
 

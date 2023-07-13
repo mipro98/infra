@@ -9,26 +9,13 @@
     mode: "0755"
 
 - name: Copy maintenance script.
-  ansible.builtin.copy:
-    src: "mpserver-maintenance.sh"
+  ansible.builtin.template:
+    src: "mpserver-maintenance.sh.j2"
     dest: "/home/{{ username }}/maintenance/mpserver-maintenance.sh"
     owner: "{{ username }}"
     group: "{{ unixgroup }}"
     mode: '744'
-
-- name: Replace username, compose_dir and dockerdata_dir in maintenance script.
-  ansible.builtin.lineinfile:
-    dest: "/home/{{ username }}/maintenance/mpserver-maintenance.sh"
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    state: "present"
-  with_items:
-    - regexp: "^DOCKER_USER="
-      line: "DOCKER_USER={{ username }}"
-    - regexp: "^COMPOSE_REPO="
-      line: "COMPOSE_REPO=\"{{ docker_compose_dir }}\""
-    - regexp: "^DOCKERDATA="
-      line: "DOCKERDATA=\"{{ docker_data_dir }}\""
+  tags: script
 
 - name: Copy systemd service for maintenance script.
   become: true
@@ -47,9 +34,9 @@
     enabled: false
 
 - name: Copy btrbk configuration.
-  ansible.builtin.copy:
-    src: "btrbk.conf"
-    dest: "/etc/btrbk/btrbk.conf"
+  ansible.builtin.template:
+    src: "btrbk.conf.j2"
+    dest: "{{ btrbk_config_dir }}"
     owner: root
     group: root
     mode: '0644'

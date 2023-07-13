@@ -98,18 +98,18 @@ target_preserve_min     no
 # target_preserve         20d 10w *m
 
 
-volume /mnt/NAS
+volume {{ mount_nas_drive }}
 
   #######################################################
 
   subvolume Daten
 
     # SNAPSHOTS
-    snapshot_dir snapshots/Daten    # Create snapshots in /mnt/NAS/snapshots/Daten
+    snapshot_dir snapshots/Daten    # Create snapshots in {{ mount_nas_drive }}/snapshots/Daten
     snapshot_preserve       30d 8w 12m
 
     # BACKUPS
-    target /mnt/BACKUP/Daten
+    target {{ mount_backup_drive }}/Daten
     target_preserve         52w *y
 
 
@@ -122,7 +122,7 @@ volume /mnt/NAS
     snapshot_preserve       8w 12m
 
     # BACKUPS
-    target /mnt/BACKUP/Filme
+    target {{ mount_backup_drive }}/Filme
     target_preserve         12m *y
 
 
@@ -135,7 +135,7 @@ volume /mnt/NAS
     snapshot_preserve       8w 12m
 
     # BACKUPS
-    target /mnt/BACKUP/Musik
+    target {{ mount_backup_drive }}/Musik
     target_preserve         12m *y
 
 
@@ -148,7 +148,7 @@ volume /mnt/NAS
     snapshot_preserve       4w
 
     # BACKUPS
-    target /mnt/BACKUP/Backups
+    target {{ mount_backup_drive }}/Backups
     target_preserve         52w 24m *y
 
 
@@ -161,5 +161,5 @@ volume /mnt/NAS
     snapshot_preserve       8w
 
     # BACKUPS
-    target /mnt/BACKUP/Archiv
+    target {{ mount_backup_drive }}/Archiv
     target_preserve         52w 24m *y

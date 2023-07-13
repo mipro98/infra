@@ -40,7 +40,7 @@ services:
 
     volumes:
       - "{{ docker_data_dir }}/nextcloud/data:/var/www/html"
-      - /mnt/NAS/Daten/Nextcloud:/var/www/html/data
+      - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data"
 
     labels:
       - "traefik.enable=true"

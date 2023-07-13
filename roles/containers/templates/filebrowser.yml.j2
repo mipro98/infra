@@ -7,7 +7,7 @@ services:
     volumes:
       - "{{ docker_data_dir }}/filebrowser/filebrowser.db:/database/filebrowser.db"
       - "{{ docker_data_dir }}/filebrowser/settings.json:/config/settings.json"
-      - "/mnt/NAS:/srv:ro"
+      - "{{ mount_nas_drive }}:/srv:ro"
     environment:
       - PUID=1000
       - PGID=984

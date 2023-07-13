@@ -13,10 +13,22 @@
     name: "{{ extra_packages }}"
     state: present
 
+- name: Ensure mount points exist.
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0755"
+    recurse: false
+  with_items:
+    - "{{ mount_nas_drive }}"
+    - "{{ mount_backup_drive }}"
+
 - name: Ensure mount for BACKUP drive is correct in fstab.
   ansible.posix.mount:
     backup: true
-    path: /mnt/BACKUP
+    path: "{{ mount_backup_drive }}"
     state: present
     src: UUID=cbee23ff-7a60-4aa2-911c-d4ab0890f99e
     fstype: btrfs
@@ -26,7 +38,7 @@
 - name: Ensure mount for NAS drive is correct in fstab.
   ansible.posix.mount:
     backup: true
-    path: /mnt/NAS  # remember this is hardcoded in the compose files also!
+    path: "{{ mount_nas_drive }}"  # remember this is hardcoded in the compose files also!
     state: mounted
     src: UUID=0bdf23c9-940f-42a8-a763-288bc77f8dd7
     fstype: btrfs

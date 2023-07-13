@@ -5,7 +5,6 @@
   vars_files:
     - vars/vault.yml
 
-
   roles:
     - role: system
       become: true
