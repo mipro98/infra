@@ -137,20 +137,19 @@ restart_containers()
     log "$(docker ps --format '{{.Names}}')"
 }
 
-# TODO: not going to work because of environement vars and .env files!
+# TODO: maybe let ansible construct these paths according to enabled services
 docker_compose_all_services()
 {
     log "Running docker-compose $1 on all services..."
     if ! $DRYRUN; then
-        sudo -H -E -u $DOCKER_USER bash -c '\
         docker-compose \
-            -f $COMPOSE_REPO/dokuwiki/docker-compose.yml \
-            -f $COMPOSE_REPO/gitea/docker-compose.yml \
-            -f $COMPOSE_REPO/homer/docker-compose.yml \
-            -f $COMPOSE_REPO/nextcloud/docker-compose.yml \
-            -f $COMPOSE_REPO/traefik/docker-compose.yml \
-            -f $COMPOSE_REPO/vaultwarden/docker-compose.yml \
-            "$1"' |& tee -a $LOGFILE
+            -f "${COMPOSE_REPO}/dokuwiki/docker-compose.yml" \
+            -f "${COMPOSE_REPO}/gitea/docker-compose.yml" \
+            -f "${COMPOSE_REPO}/homer/docker-compose.yml" \
+            -f "${COMPOSE_REPO}/nextcloud/docker-compose.yml" \
+            -f "${COMPOSE_REPO}/traefik/docker-compose.yml" \
+            -f "${COMPOSE_REPO}/vaultwarden/docker-compose.yml" \
+            "$1" |& tee -a $LOGFILE
     fi
 }
 
