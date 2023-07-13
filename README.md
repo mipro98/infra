@@ -4,7 +4,8 @@
 
 1. Clone the repo.
 2. Run `./git-init.sh`
-3. Deploy (see below)
+3. (optionally: run `source unlock-bw.sh`)
+4. Deploy (see below)
 
 
 Deploy everything:
