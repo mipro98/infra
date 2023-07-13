@@ -16,6 +16,20 @@
     group: "{{ unixgroup }}"
     mode: '744'
 
+- name: Replace username, compose_dir and dockerdata_dir in maintenance script.
+  ansible.builtin.lineinfile:
+    dest: "/home/{{ username }}/maintenance/mpserver-maintenance.sh"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: "present"
+  with_items:
+    - regexp: "^DOCKER_USER="
+      line: "DOCKER_USER={{ username }}"
+    - regexp: "^COMPOSE_REPO="
+      line: "COMPOSE_REPO=\"{{ docker_compose_dir }}\""
+    - regexp: "^DOCKERDATA="
+      line: "DOCKERDATA=\"{{ docker_data_dir }}\""
+
 - name: Copy systemd service for maintenance script.
   become: true
   ansible.builtin.template:

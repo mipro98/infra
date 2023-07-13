@@ -50,9 +50,9 @@ LOCKFILE=/tmp/running-maintenance.lock
 MOUNT_BKP_DRIVE="/mnt/BACKUP"
 MOUNT_NAS="/mnt/NAS"
 
-DOCKER_USER=mp  # user to execute docker-compose command
-COMPOSE_REPO="/home/mp/docker"
-DOCKERDATA="/home/mp/dockerdata"
+DOCKER_USER=  # user to execute docker-compose command
+COMPOSE_REPO=
+DOCKERDATA=
 
 DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi_zusaetzliche-Backups/00_dockerdata"
 
