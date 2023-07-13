@@ -14,7 +14,7 @@ make deploy
 
 Deploy only docker-compose changes:
 ```bash
-make docker-compose
+make containers
 ```
 
 Deploy only system changes:
@@ -31,7 +31,3 @@ This repo uses ansible-vault to encrypt secret veriables used by ansible (passwo
 
 **Also, absolutely run the script `git-init.sh` after cloning to install a pre-commit hook which prevents committing the unencrypted vault!**
 
-
-## Why no roles?
-
-To keep things simple, I chose not to use roles (for now) since that would mean a much more nested and constrained folder structure. Since I only have two basic "groups" of tasks I just `import` them in my `run.yml` main playbook and all the tasks can share folders for files/templates, variables and handlers without having to create seperate per-role folders for them.
