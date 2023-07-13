@@ -6,8 +6,8 @@ services:
     restart: always
     container_name: dokuwiki
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID={{ username_id.stdout }}
+      - PGID={{ unixgroup_id.stdout }}
       - TZ=Europe/Berlin
     volumes:
       - "{{ docker_data_dir }}/dokuwiki:/config"

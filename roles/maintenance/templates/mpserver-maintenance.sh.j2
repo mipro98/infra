@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # https://unix.stackexchange.com/a/228333
-set -u
-: "$BATCHNUM"
+# set -u
 
 # This file is the ultimate snapshot + backup + notification script for my homeserver.
 #
@@ -22,29 +21,10 @@ set -u
 #     2. Execute operations based on schedule
 #     3. send the log via email.
 #
-#
-# The schedule is as follows:
-#
-#     - Daily:
-#         - "Daten" snapshot
-#
-#     - Weekly (every Sunday):
-#         1. Mount Backup drive
-#         2. Stop docker containers
-#         3. Backup persistent volumes from SSD to HDD "Backup" Subvolume via rsync
-#         4. Update docker containers (pull) and prune old containers
-#         5. Snapshot of all Subvolumes
-#         6. restart docker containers
-#         7. Backup/sync snapshots to Backup drive according to btrbk retention policy
-#         8. unmount backup drive
-#         9. update the system
-#
-#     - Monthly (every last Sunday of month):
-#         1. All of weekly
-#         2. btrfs-scrub both NAS drive and Backup drive
-#         3. Checking S.M.A.R.T values and detecting suspicious values
 
 DRYRUN=true
+
+LOG_TYPE="unset"
 
 # Get this script folder path
 SCRIPTDIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -82,8 +62,8 @@ log()
 
 send_email_with_logs()
 {
-    log "sending email"
-    # mail -s "Server Maintenance Log" mps < $LOGFILE
+    # log "sending email"
+    mutt -s "$LOG_TYPE Server Maintenance Log $(date +%F)" {{ email_alerts_receiver }} < $LOGFILE &> /dev/null
 }
 
 
@@ -103,24 +83,24 @@ mount_backup_drive()
 reboot_required()
 {
     local active_kernel current_kernel
-    active_kernel=$(uname -r)
+    active_kernel=$(uname -r | sed 's/-arch/.arch/')
     current_kernel=$(pacman -Q linux | sed 's/linux //')
-    if [[ $active_kernel != $current_kernel ]]; then
-        log "A reboot is required! \n\trunning: $active_kernel \n\tinstalled: $current_kernel"
+    if [[ $active_kernel != "$current_kernel" ]]; then
+        log "\n\nA reboot is required! \n\trunning: $active_kernel \n\tinstalled: $current_kernel"
     fi
 }
 
 update_system()
 {
     # update system
-    if checkupdates; then
-        log "updates available:"
+    if checkupdates &> /dev/null; then
+        log "\n\nupdates available:"
         log "$(checkupdates)"
         if ! $DRYRUN; then
             pacman -Syu --noconfirm &>> $LOGFILE
         fi
     else
-        log "No system updates available."
+        log "\n\nNo system updates available."
     fi
     reboot_required
 }
@@ -130,23 +110,27 @@ update_system()
 stop_containers()
 {
     # stop all docker containers
-    log "stopping containers:"
-    log "$(docker ps --format {% raw %}'{{.Names}}'{% endraw %})"
-    docker stop "$(docker ps -q)"
+    log "\n\nstopping containers:"
+    log "$(docker ps --format {% raw %}'\t{{.Names}}'{% endraw %})"
+    if ! $DRYRUN; then
+        docker stop "$(docker ps -q)"
+    fi
 }
 
 restart_containers()
 {
     # restart docker containers
-    docker start "$(docker ps -a -q)"
-    log "Restarted containers:"
-    log "$(docker ps --format {% raw %}'{{.Names}}'{% endraw %})"
+    if ! $DRYRUN; then
+        docker start "$(docker ps -a -q)"
+    fi
+    log "\n\nRestarted containers:"
+    log "$(docker ps --format {% raw %}'\t{{.Names}}'{% endraw %})"
 }
 
-# TODO: maybe let ansible construct these paths according to enabled services
+
 docker_compose_all_services()
 {
-    log "Running docker-compose $1 on all services..."
+    log "\n\nRunning docker-compose $1 on all services..."
     if ! $DRYRUN; then
         docker-compose \
         {% for service in docker_services %}
@@ -158,7 +142,7 @@ docker_compose_all_services()
 
 docker_prune()
 {
-    log "Pruning docker system..."
+    log "\n\nPruning docker system..."
     if ! $DRYRUN; then
         docker system prune -af --volumes &>> $LOGFILE
     fi
@@ -171,13 +155,13 @@ docker_prune()
 
 backup_dockerdata()
 {
-    log "rsyncing files from dockerdata to Backup subvolumes. If errors occur, they are reported in the next line."
+    log "\n\nRsyncing files from dockerdata to Backup subvolumes. If errors occur, they are reported in the next line."
     $RSYNC_CMD -Aaz --delete "${DOCKERDATA}/" "$DOCKERDATA_BKP_DIR" 2>> $LOGFILE
 }
 
 snapshot_all()
 {
-    log "Create snapshots of all subvolumes..."
+    log "\n\nCreate snapshots of all subvolumes..."
     # create btrfs snapshots of all subvolumes
     $BTRBK_CMD --preserve snapshot &>> $LOGFILE
 }
@@ -185,7 +169,7 @@ snapshot_all()
 
 run_backup()
 {
-    log "Creating BACKUP: syncing snapshots with external drive using btrbk"
+    log "\n\nCreating BACKUP: syncing snapshots with external drive using btrbk"
     $BTRBK_CMD resume &>> $LOGFILE
 }
 
@@ -194,11 +178,11 @@ scrub() {
         log "ERROR: no device for scrubbing specified!";
         return 1
     fi
-    log "Starting scrub for $1..."
+    log "\n\nStarting scrub for $1..."
     if ! $DRYRUN; then
         btrfs scrub start -Bd -c 2 -n 4 $1 &>> $LOGFILE
     fi
-    btrfs dev stats $1 $>> $LOGFILE
+    btrfs dev stats "$1" &>> $LOGFILE
 }
 
 # ----------------------------------------------------- Scripts ----------------------------------------------------------
@@ -207,7 +191,8 @@ scrub() {
 daily()
 {
     echo "Running Daily script."
-    log "Running Daily script."
+    log "$(date +%F), $(date +%T): Running Daily script."
+    LOG_TYPE="Daily"
 
     # make a snapshot of "Daten" subvolume
     log "Creating snapshot of 'Daten' subvolume."
@@ -217,7 +202,8 @@ daily()
 weekly()
 {
     echo "Running Weekly script"
-    log "Running Weekly script"
+    log "$(date +%F), $(date +%T): Running Weekly script"
+    LOG_TYPE="Weekly"
 
     mount_backup_drive
     stop_containers
@@ -231,13 +217,13 @@ weekly()
     umount $MOUNT_BKP_DRIVE
 
     update_system
-    reboot_required
 }
 
 monthly()
 {
     echo "Running Monthly script"
-    log "Running Monthly script"
+    log "$(date +%F), $(date +%T): Running Monthly script"
+    LOG_TYPE="Monthly"
 
     mount_backup_drive
     stop_containers
@@ -254,8 +240,11 @@ monthly()
     scrub $MOUNT_NAS
     scrub $MOUNT_BKP_DRIVE
 
+    # unmount backup drive
+    sync
+    umount $MOUNT_BKP_DRIVE
+
     update_system
-    reboot_required
 }
 
 
@@ -279,24 +268,21 @@ evaluate_schedule()
     fi
 }
 
-
-self_test()
-{
-    # test if drive is persist
-    # test if docker containers can be stopped and started
-    # test if btrfs file systems are availabe and print stats
-    # check if updates are available
-    # check if reboot_required
-}
-
 # --------------------------------------------------------- Main -------------------------------------------------------
 
-# check if root
+
+
+
+# --------------------- check if root ------------------------
+
 if [[ $(id -u) -ne 0 ]]
 then
     echo "Please run as root!"
     exit 1
 fi
+
+
+# -------------------- check lockfile -----------------------
 
 # create log file with user owner
 sudo -u $DOCKER_USER touch "$LOGFILE"
@@ -314,7 +300,12 @@ touch $LOCKFILE
 log "DRYRUN: $DRYRUN"
 
 
-if [[ -z $1 ]];
+
+
+# -------------------- evaluate arguments -----------------------
+
+
+if [[ -z $1 || $1 == "--dry-run" ]];
 then
     evaluate_schedule
 else
@@ -330,7 +321,7 @@ else
     fi
 fi
 
-log "$(date +%F), $(date +%T): SUCCESSFULLY FINISHED."
+log "\n\n$(date +%F), $(date +%T): SUCCESSFULLY FINISHED."
 send_email_with_logs
 rm $LOCKFILE
 exit 0

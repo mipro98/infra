@@ -9,8 +9,8 @@ services:
       - "{{ docker_data_dir }}/filebrowser/settings.json:/config/settings.json"
       - "{{ mount_nas_drive }}:/srv:ro"
     environment:
-      - PUID=1000
-      - PGID=984
+      - PUID={{ username_id.stdout }}
+      - PGID={{ unixgroup_id.stdout }}
     restart: always
     labels:
       - "traefik.enable=false"  # keep traefik off for now
