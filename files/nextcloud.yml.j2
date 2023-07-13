@@ -1,0 +1,65 @@
+version: '2'
+
+services:
+
+  nextcloud-db:
+    image: mariadb:10.6
+    container_name: nextcloud-db
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+
+    environment:
+      - MYSQL_ROOT_PASSWORD={{ nextcloud_db_root_pw }}
+      - MYSQL_PASSWORD={{ nextcloud_db_user_pw }}
+      - MYSQL_USER={{ nextcloud_db_user }}
+      - MYSQL_DATABASE=nextcloud
+      - TZ=Europe/Berlin
+
+    volumes:
+      - "{{ docker_data_dir }}/nextcloud/db:/var/lib/mysql"
+
+    networks:
+      - traefik-net
+
+
+
+  nextcloud:
+    image: nextcloud:27-apache
+    container_name: nextcloud
+    restart: always
+    links:
+      - nextcloud-db
+    depends_on:
+      - nextcloud-db
+
+    environment:
+      - MYSQL_PASSWORD={{ nextcloud_db_user_pw }}
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER={{ nextcloud_db_user }}
+      - MYSQL_HOST=nextcloud-db
+
+    volumes:
+      - "{{ docker_data_dir }}/nextcloud/data:/var/www/html"
+      - /mnt/NAS/Daten/Nextcloud:/var/www/html/data
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.rule=Host({{ nextcloud_domain }})"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      # Redirect path for CalDAV/CardDAV:
+      - "traefik.http.middlewares.nextcloud-dav.replacepathregex.regex=^/.well-known/ca(l|rd)dav"
+      - "traefik.http.middlewares.nextcloud-dav.replacepathregex.replacement=/remote.php/dav/"
+
+    networks:
+      - traefik-net
+
+
+networks:
+    traefik-net:
+        external: true
+
+
+

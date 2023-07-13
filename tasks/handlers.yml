@@ -1,0 +1,7 @@
+- name: Send test email
+  become: true      # use root account for sending mails
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && \
+          echo \"This is a test email after configuring the server. If you receive this email, it is working!\" |\
+          mutt -s \"Server is setup for Email notifications!\" \"{{ email_testmail_receiver }}\""
+    removes: /root/.muttrc  # only run if mutt config is present

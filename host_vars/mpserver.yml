@@ -1,0 +1,77 @@
+username: mp
+unixgroup: users
+
+extra_packages:
+  - autoconf
+  - automake
+  - base
+  - bison
+  - btrbk
+  - debugedit
+  - docker
+  - docker-compose
+  - flex
+  - fwupd
+  - gcc
+  - git-crypt
+  - grub
+  - hdparm
+  - htop
+  - intel-ucode
+  - iotop
+  - libva-utils
+  - make
+  - mutt
+  - man-db
+  - micro
+  - nano
+  - neofetch
+  - net-tools
+  - pacman-contrib
+  - patch
+  - pkgconf
+  - powertop
+  - reflector
+  - samba
+  - smartmontools
+  - texinfo
+  - tmux
+  - tree
+  - unzip
+  - wget
+  - wol
+  - zsh-completions
+
+
+
+
+# SSH vars
+
+security_ssh_config_path: /etc/ssh/sshd_config_ansible
+security_sshd_name: sshd
+
+security_ssh_allowed_users: ['{{ username }}']
+security_ssh_allowed_groups: []
+security_sudoers_passwordless: ['{{ username }}']
+security_sudoers_passworded: []
+
+security_ssh_port: 2968
+security_ssh_password_authentication: "no"
+security_ssh_permit_root_login: "no"
+security_ssh_permit_empty_password: "no"
+security_ssh_challenge_response_auth: "no"
+security_ssh_x11_forwarding: "no"
+
+security_sshd_state: started
+
+docker_compose_dir: "/home/{{ username }}/docker-ansible"
+docker_data_dir: "/home/{{ username }}/dockerdata"
+docker_services:
+  - bookstack
+  - dokuwiki
+  - vaultwarden
+  - nextcloud
+  - filebrowser
+  - homer
+  - gitea
+  - traefik

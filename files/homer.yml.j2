@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+
+  homer:
+    image: b4bz/homer:latest
+    restart: always
+    container_name: homer
+    user: "{{ username_id.stdout }}:{{ unixgroup_id.stdout }}"    # dynamically obtained UID/GID using ansible
+
+    volumes:
+      - "{{ docker_data_dir }}/homer:/www/assets"
+    #   - ./config.yml:/www/assets/config.yml
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homer.rule=Host({{ homer_domain }})"
+      - "traefik.http.routers.homer.entrypoints=websecure"
+      - "traefik.http.routers.homer.tls=true"
+      - "traefik.http.routers.homer.tls.certresolver=letsencrypt"
+      # we want basic auth for the dashboard!
+      - "traefik.http.middlewares.homer-auth.basicauth.users={{ homer_login }}"
+      - "traefik.http.routers.homer.middlewares=homer-auth@docker"
+
+    networks:
+      - traefik-net
+
+networks:
+    traefik-net:
+        external: true
+

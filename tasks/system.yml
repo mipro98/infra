@@ -1,0 +1,59 @@
+---
+
+- name: Create login user {{ username }}
+  ansible.builtin.user:
+    name: "{{ username }}"
+    group: "{{ unixgroup }}"    # maybe first create these groups??
+    groups:
+      - docker
+    append: true
+
+- name: Ensure packages are installed.
+  community.general.pacman:
+    name: "{{ extra_packages }}"
+    state: present
+
+- name: Ensure mount for BACKUP drive is correct in fstab.
+  ansible.posix.mount:
+    backup: true
+    path: /mnt/BACKUP
+    state: present
+    src: UUID=cbee23ff-7a60-4aa2-911c-d4ab0890f99e
+    fstype: btrfs
+    opts: defaults,noatime,compress=lzo,space_cache=v2,nofail,x-systemd.device-timeout=5s,subvolid=5
+
+
+- name: Ensure mount for NAS drive is correct in fstab.
+  ansible.posix.mount:
+    backup: true
+    path: /mnt/NAS  # remember this is hardcoded in the compose files also!
+    state: mounted
+    src: UUID=0bdf23c9-940f-42a8-a763-288bc77f8dd7
+    fstype: btrfs
+    opts: "defaults,noatime,compress=lzo,space_cache=v2,nofail,x-systemd.device-timeout=5s,\
+          x-systemd.required-by=docker.service,x-systemd.before=docker.service,subvolid=5"
+
+
+- name: Place .tmux.conf
+  ansible.builtin.copy:
+    content: "set -g mouse on\n"
+    dest: "/home/{{ username }}/.tmux.conf"
+    mode: '644'
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+
+
+- name: Configure mutt
+  ansible.builtin.template:
+    src: files/muttrc.j2
+    dest: /root/.muttrc
+    owner: root
+    group: root
+    mode: '600'
+  notify: Send test email
+
+- name: Ensure docker service is running.
+  ansible.builtin.systemd:
+    name: "docker"
+    state: "started"
+    enabled: true

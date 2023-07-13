@@ -1,0 +1,29 @@
+version: "2.1"
+services:
+  gitea:
+    container_name: gitea
+    image: gitea/gitea
+    ports:
+      - "{{ gitea_ssh_port }}:22" #ssh port
+    environment:
+      - USER_UID={{ username_id.stdout }}
+      - USER_GID={{ unixgroup_id.stdout }}
+    restart: always
+    volumes:
+      - "{{ docker_data_dir }}/gitea:/data"
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitea.rule=Host({{ gitea_domain }})"
+      - "traefik.http.routers.gitea.entrypoints=websecure"
+      - "traefik.http.routers.gitea.tls=true"
+      - "traefik.http.routers.gitea.tls.certresolver=letsencrypt"
+      # tell traefik to use port 80 of the container and not the SSH port:
+      - "traefik.http.services.gitea.loadbalancer.server.port=80"
+    networks:
+      - traefik-net
+
+networks:
+    traefik-net:
+        external: true

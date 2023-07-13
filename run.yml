@@ -1,0 +1,32 @@
+---
+
+- name: Tasks and roles for all hosts
+  hosts: mpserver
+  vars_files:
+    - vars/vault.yml
+
+
+  tasks:
+    # - name: Setup openssh.
+    #   ansible.builtin.import_tasks: tasks/ssh.yml
+    #   tags:
+    #     - system
+    #     - ssh
+
+
+    - name: Apply system setup.
+      become: true
+      ansible.builtin.import_tasks: tasks/system.yml
+      tags:
+        - system
+
+    - name: Setup Docker.
+      become: false
+      ansible.builtin.import_tasks: tasks/docker.yml
+      tags:
+        - compose
+
+
+  handlers:
+    - name: Include Handlers
+      ansible.builtin.import_tasks: tasks/handlers.yml

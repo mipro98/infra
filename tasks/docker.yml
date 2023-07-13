@@ -1,0 +1,64 @@
+---
+
+- name: Create folders for docker-compose files.
+  ansible.builtin.file:
+    path: "{{ docker_compose_dir }}/{{ item }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0755"
+  with_items: "{{ docker_services }}"
+
+- name: Get UID for user "{{ username }}" from shell (to be used later in compose templates).
+  become: false
+  ansible.builtin.shell:
+    cmd: id -u
+  register: username_id
+
+- name: Get GID for group "{{ unixgroup }}" from shell (to be used later in compose templates).
+  become: false
+  ansible.builtin.shell:
+    cmd: id -g
+  register: unixgroup_id
+
+- name: Copy docker-compose.yml files for the enabled services in the respective folders
+  ansible.builtin.template:
+    src: "files/{{ item }}.yml.j2"
+    dest: "{{ docker_compose_dir }}/{{ item }}/docker-compose.yml"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: '644'
+  with_items: "{{ docker_services }}"
+
+
+- name: Create maintenance folder.
+  ansible.builtin.file:
+    path: "/home/{{ username }}/maintenance/logs"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0755"
+
+- name: Copy maintenance script.
+  ansible.builtin.copy:
+    src: "files/mpserver-maintenance.sh"
+    dest: "/home/{{ username }}/maintenance/mpserver-maintenance.sh"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: '744'
+
+- name: Copy systemd service for maintenance script.
+  become: true
+  ansible.builtin.template:
+    src: "files/mpserver-maintenance.service.j2"
+    dest: "/etc/systemd/system/mpserver-maintenance.service"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Setup systemd service for maintenance script.
+  become: true
+  ansible.builtin.systemd:
+    name: mpserver-maintenance
+    state: "started"
+    enabled: false

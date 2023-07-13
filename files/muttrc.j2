@@ -1,0 +1,8 @@
+set my_pass='{{ smtp_pass }}'
+set my_user={{ smtp_user }}
+set realname = '{{ smtp_sender_name }}'
+set from = {{ smtp_sender_addr }}
+set use_from = yes
+set smtp_pass = $my_pass
+set smtp_url=smtps://$my_user@{{ smtp_server_addr }}
+set ssl_force_tls = yes

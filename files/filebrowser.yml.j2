@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+  filebrowser:
+    image: filebrowser/filebrowser:s6
+    user: "{{ username_id.stdout }}:{{ unixgroup_id.stdout }}"    # dynamically obtained UID/GID using ansible
+    volumes:
+      - "{{ docker_data_dir }}/filebrowser/filebrowser.db:/database/filebrowser.db"
+      - "{{ docker_data_dir }}/filebrowser/settings.json:/config/settings.json"
+      - "/mnt/NAS:/srv:ro"
+    environment:
+      - PUID=1000
+      - PGID=984
+    restart: always
+    labels:
+      - "traefik.enable=false"  # keep traefik off for now
+      - "traefik.http.routers.filebrowser.rule=Host({{ filebrowser_domain }})"
+      - "traefik.http.routers.filebrowser.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser.tls=true"
+      - "traefik.http.routers.filebrowser.tls.certresolver=letsencrypt"
+    networks:
+      - traefik-net
+
+networks:
+    traefik-net:
+        external: true
