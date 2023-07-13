@@ -17,6 +17,14 @@
     mode: '744'
   tags: script
 
+- name: Copy btrbk configuration.
+  ansible.builtin.template:
+    src: "btrbk.conf.j2"
+    dest: "{{ btrbk_config_dir }}"
+    owner: root
+    group: root
+    mode: '0644'
+
 - name: Copy systemd service for maintenance script.
   become: true
   ansible.builtin.template:
@@ -26,17 +34,25 @@
     group: root
     mode: '0644'
 
-- name: Setup systemd service for maintenance script.
+- name: Enable systemd service for maintenance script.
   become: true
   ansible.builtin.systemd:
     name: mpserver-maintenance
     state: "started"
-    enabled: false
+    enabled: true
 
-- name: Copy btrbk configuration.
-  ansible.builtin.template:
-    src: "btrbk.conf.j2"
-    dest: "{{ btrbk_config_dir }}"
+- name: Copy systemd timer which triggers systemd service.
+  become: true
+  ansible.builtin.copy:
+    src: "mpserver-maintenance.timer"
+    dest: "/etc/systemd/system/mpserver-maintenance.timer"
     owner: root
     group: root
     mode: '0644'
+
+- name: Enable systemd timer for service trigger.
+  become: true
+  ansible.builtin.systemd:
+    name: mpserver-maintenance.timer
+    state: "started"
+    enabled: true
