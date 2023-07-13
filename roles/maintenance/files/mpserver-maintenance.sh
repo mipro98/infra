@@ -50,9 +50,13 @@ LOCKFILE=/tmp/running-maintenance.lock
 MOUNT_BKP_DRIVE="/mnt/BACKUP"
 MOUNT_NAS="/mnt/NAS"
 
+# ------ These variables get filled by Ansible according to its vars: ------
+
 DOCKER_USER=  # user to execute docker-compose command
 COMPOSE_REPO=
 DOCKERDATA=
+
+# --------------
 
 DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi_zusaetzliche-Backups/00_dockerdata"
 
