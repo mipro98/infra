@@ -6,32 +6,18 @@
     - vars/vault.yml
 
 
-  tasks:
-    # - name: Setup openssh.
-    #   ansible.builtin.import_tasks: tasks/ssh.yml
-    #   tags:
-    #     - system
-    #     - ssh
-
-
-    - name: Apply system setup.
+  roles:
+    - role: system
       become: true
-      ansible.builtin.import_tasks: tasks/system.yml
       tags:
         - system
 
-    - name: Setup Docker.
+    - role: containers
       become: false
-      ansible.builtin.import_tasks: tasks/docker.yml
       tags:
         - compose
 
-    - name: Setup backup and maintenance routines.
+    - role: maintenance
       become: true
-      ansible.builtin.import_tasks: tasks/maintenance.yml
       tags:
         - maintenance
-
-  handlers:
-    - name: Include Handlers
-      ansible.builtin.import_tasks: tasks/handlers.yml

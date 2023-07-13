@@ -1,4 +1,4 @@
-- name: Send test email
+- name: Send test email.
   become: true      # use root account for sending mails
   ansible.builtin.shell:
     cmd: "set -o pipefail && \

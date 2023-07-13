@@ -23,7 +23,7 @@
 
 - name: Copy docker-compose.yml files for the enabled services in the respective folders
   ansible.builtin.template:
-    src: "files/{{ item }}.yml.j2"
+    src: "{{ item }}.yml.j2"
     dest: "{{ docker_compose_dir }}/{{ item }}/docker-compose.yml"
     owner: "{{ username }}"
     group: "{{ unixgroup }}"

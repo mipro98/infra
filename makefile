@@ -1,7 +1,7 @@
 deploy:
 	ansible-playbook run.yml
 
-docker-compose:
+containers:
 	ansible-playbook run.yml -t compose
 
 system:
