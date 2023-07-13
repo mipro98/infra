@@ -7,6 +7,11 @@ docker-compose:
 system:
 	ansible-playbook run.yml -t system
 
+maintenance:
+	ansible-playbook run.yml -t maintenance
+
+# -----------------
+
 decrypt:
 	ansible-vault decrypt vars/vault.yml
 

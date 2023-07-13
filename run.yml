@@ -26,6 +26,11 @@
       tags:
         - compose
 
+    - name: Setup backup and maintenance routines.
+      become: true
+      ansible.builtin.import_tasks: tasks/maintenance.yml
+      tags:
+        - maintenance
 
   handlers:
     - name: Include Handlers
