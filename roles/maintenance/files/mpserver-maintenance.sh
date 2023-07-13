@@ -112,7 +112,9 @@ update_system()
     if checkupdates; then
         log "updates available:"
         log "$(checkupdates)"
-        pacman -Syu --noconfirm &>> $LOGFILE
+        if ! $DRYRUN; then
+            pacman -Syu --noconfirm &>> $LOGFILE
+        fi
     else
         log "No system updates available."
     fi
@@ -277,15 +279,13 @@ evaluate_schedule()
 }
 
 
-test_ftn()
+self_test()
 {
-    # mount_backup_drive
-    # stop_containers
-    # backup_dockerdata
-    # restart_containers
-
-    log "this is a test log"
-    send_email_with_logs
+    # test if drive is persist
+    # test if docker containers can be stopped and started
+    # test if btrfs file systems are availabe and print stats
+    # check if updates are available
+    # check if reboot_required
 }
 
 # --------------------------------------------------------- Main -------------------------------------------------------
@@ -321,7 +321,6 @@ else
     elif [[ "$1" == "--daily" ]]; then daily
     elif [[ "$1" == "--weekly" ]]; then weekly
     elif [[ "$1" == "--backup-dockerdata" ]]; then backup_dockerdata
-    elif [[ "$1" == "--test" ]]; then test_ftn
     else
         echo "unknown parameter!"
         rm $LOGFILE
