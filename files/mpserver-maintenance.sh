@@ -317,6 +317,7 @@ else
     if [[ "$1" == "--monthly" ]]; then monthly
     elif [[ "$1" == "--daily" ]]; then daily
     elif [[ "$1" == "--weekly" ]]; then weekly
+    elif [[ "$1" == "--backup-dockerdata" ]]; then backup_dockerdata
     elif [[ "$1" == "--test" ]]; then test_ftn
     else
         echo "unknown parameter!"
@@ -326,7 +327,7 @@ else
     fi
 fi
 
-rm $LOCKFILE
 log "$(date +%F), $(date +%T): SUCCESSFULLY FINISHED."
 send_email_with_logs
+rm $LOCKFILE
 exit 0
