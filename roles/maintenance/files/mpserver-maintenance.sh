@@ -60,7 +60,7 @@ DOCKERDATA=
 
 DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi_zusaetzliche-Backups/00_dockerdata"
 
-BTRBK_CONFIG="$COMPOSE_REPO/NATIVE/btrbk.conf"
+BTRBK_CONFIG="/etc/btrbk/btrbk.conf"
 
 if $DRYRUN; then
     RSYNC_CMD="rsync --dry-run"
