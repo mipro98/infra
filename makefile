@@ -10,6 +10,9 @@ system:
 maintenance:
 	ansible-playbook run.yml -t maintenance
 
+script:
+	ansible-playbook run.yml -t script
+
 # -----------------
 
 decrypt:
