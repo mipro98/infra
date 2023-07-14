@@ -14,7 +14,7 @@ services:
 
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.homer.rule=Host({{ homer_domain }})"
+      - "traefik.http.routers.homer.rule=Host(`{{ homer_domain }}`)"
       - "traefik.http.routers.homer.entrypoints=websecure"
       - "traefik.http.routers.homer.tls=true"
       - "traefik.http.routers.homer.tls.certresolver=letsencrypt"

@@ -9,10 +9,10 @@ services:
       - WEBSOCKET_ENABLED=true
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.vaultwarden.rule=Host({{ vaultwarden_domain }})"
+      - "traefik.http.routers.vaultwarden.rule=Host(`{{ vaultwarden_domain }}`)"
       - "traefik.http.routers.vaultwarden.entrypoints=websecure"
       - "traefik.http.routers.vaultwarden.tls=true"
-      - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt
+      - "traefik.http.routers.vaultwarden.tls.certresolver=letsencrypt"
       - "traefik.http.services.vaultwarden.loadbalancer.server.port=80"
     volumes:
       - "{{ docker_data_dir }}/vaultwarden:/data"

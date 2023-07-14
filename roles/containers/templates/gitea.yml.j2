@@ -15,7 +15,7 @@ services:
       - /etc/localtime:/etc/localtime:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.gitea.rule=Host({{ gitea_domain }})"
+      - "traefik.http.routers.gitea.rule=Host(`{{ gitea_domain }}`)"
       - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.routers.gitea.tls=true"
       - "traefik.http.routers.gitea.tls.certresolver=letsencrypt"

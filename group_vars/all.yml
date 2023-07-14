@@ -69,13 +69,13 @@ security_sshd_state: started
 
 
 # Docker vars
-docker_compose_dir: "/home/{{ username }}/docker-ansible"
+docker_compose_dir: "/home/{{ username }}/docker"
 docker_data_dir: "/home/{{ username }}/dockerdata"
 docker_services:
-  - bookstack
+  # - bookstack
   - dokuwiki
   - vaultwarden
-  - nextcloud
+  # - nextcloud
   - filebrowser
   - homer
   - gitea

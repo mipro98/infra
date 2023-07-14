@@ -20,7 +20,7 @@ services:
 
     networks:
       - traefik-net
-      
+
 
   nextcloud:
     image: nextcloud:27-apache
@@ -44,7 +44,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextcloud.tls=true"
-      - "traefik.http.routers.nextcloud.rule=Host({{ nextcloud_domain }})"
+      - "traefik.http.routers.nextcloud.rule=Host(`{{ nextcloud_domain }}`)"
       - "traefik.http.routers.nextcloud.entrypoints=websecure"
       - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
       - "traefik.http.services.nextcloud.loadbalancer.server.port=80"

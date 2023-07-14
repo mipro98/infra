@@ -7,7 +7,7 @@
 #
 # It takes care of:
 #
-#     - Creating snapshots of the correct subvolumes depending on day of the week with btrbk
+#     - Creating *snapshots* of the correct subvolumes depending on day of the week with btrbk
 #     - Mounting the BACKUP drive and creating *backups* to external drive with btrbkp
 #     - Updating the system (ARCH)
 #     - Updating docker containers
@@ -15,7 +15,7 @@
 #     - Sending a mail with a status report of all the results
 #
 #
-# Vorgehensweise:
+# Approach:
 #
 #     1. Detect day of the week and determine correct schedule.
 #     2. Execute operations based on schedule
@@ -42,7 +42,7 @@ DOCKERDATA="{{ docker_data_dir }}"
 
 # --------------
 
-DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi_zusaetzliche-Backups/00_dockerdata"
+DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi/00_dockerdata"
 
 BTRBK_CONFIG="{{ btrbk_config_dir }}"
 

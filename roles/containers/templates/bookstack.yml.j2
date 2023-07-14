@@ -25,8 +25,8 @@ services:
     container_name: bookstack_db
     restart: always
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID={{ username_id.stdout }}
+      - PGID={{ unixgroup_id.stdout }}
       - TZ=Europe/Berlin
       - MYSQL_ROOT_PASSWORD={{ bookstack_db_root_pw }}
       - MYSQL_DATABASE=bookstackapp
