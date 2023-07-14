@@ -1,5 +1,13 @@
 ---
 
+- name: Create {{ docker_data_dir }}
+  ansible.builtin.file:
+    path: "{{ docker_data_dir }}"
+    state: directory
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0755"
+
 - name: Create folders for docker-compose files.
   ansible.builtin.file:
     path: "{{ docker_compose_dir }}/{{ item }}"
