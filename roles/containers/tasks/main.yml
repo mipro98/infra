@@ -39,8 +39,8 @@
   with_items: "{{ docker_services }}"
 
 - name: Copy convenience script for starting all containers
-  ansible.builtin.template:
-    src: "compose.sh.j2"
+  ansible.builtin.copy:
+    content: "#!/bin/bash\nsudo bash /home/{{ username }}/maintenance/mpserver-maintenance.sh docker \"$@\""
     dest: "{{ docker_compose_dir }}/compose.sh"
     owner: "{{ username }}"
     group: "{{ unixgroup }}"

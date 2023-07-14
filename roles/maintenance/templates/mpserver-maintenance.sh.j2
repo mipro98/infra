@@ -22,7 +22,8 @@
 #     3. send the log via email.
 #
 
-DRYRUN=true
+DRYRUN=false
+EMAIL=true
 
 LOG_TYPE="ERROR"
 
@@ -46,26 +47,58 @@ DOCKERDATA_BKP_DIR="${MOUNT_NAS}/Backups/Michi/00_dockerdata"
 
 BTRBK_CONFIG="{{ btrbk_config_dir }}"
 
-if $DRYRUN; then
-    RSYNC_CMD="rsync --dry-run"
-    BTRBK_CMD="btrbk -c $BTRBK_CONFIG -n"
-else
-    RSYNC_CMD="rsync"
-    BTRBK_CMD="btrbk -c $BTRBK_CONFIG"
-fi
+
+usage()
+{
+    echo -e "Usage: $0 [<options>] [<command>]\n"
+
+    echo -e "Options:"
+    echo -e "\t--dry-run\tDon't execute anything, only show what would be executed"
+    echo -e "\t--no-email\tDon't send an email with the log"
+    echo -e "\t--help\t\tShow this help message and exit."
+
+    echo -e "\nCommands:"
+    echo -e "\tdaily\t\tRun daily maintenance tasks"
+    echo -e "\tweekly\t\tRun weekly maintenance tasks"
+    echo -e "\tmonthly\t\tRun monthly maintenance tasks"
+    echo -e "\tdocker <cmd>\tRun docker-compose <cmd> on all services"
+    echo -e "\n\tIf no command is passed, the script will determine the correct schedule and run the appropriate tasks."
+}
 
 
 log()
 {
-    echo -e "$1" &>> "$LOGFILE"
+    echo -e "$@" &>> "$LOGFILE"
 }
 
 send_email_with_logs()
 {
-    # log "sending email"
-    mutt -s "$LOG_TYPE Server Maintenance Log $(date +%F)" {{ email_alerts_receiver }} < $LOGFILE &> /dev/null
+    if $EMAIL; then
+        mutt -s "$LOG_TYPE Server Maintenance Log $(date +%F)" {{ email_alerts_receiver }} < $LOGFILE &> /dev/null
+    fi
 }
 
+quit_script()
+{
+    local success=true      # default is success unless an error is passed as argument
+
+    if [[ $# -gt 0 ]]; then
+        success=false
+    fi
+
+    if ! $success; then
+        log "\n\nERROR: $1"
+    fi
+
+    send_email_with_logs
+    rm $LOCKFILE
+
+    if $success; then
+        exit 0
+    else
+        exit 1
+    fi
+}
 
 # ----------------------------------------------- System -----------------------------------------------
 
@@ -130,11 +163,11 @@ restart_containers()
 
 docker_compose_all_services()
 {
-    log "\n\nRunning docker-compose $1 on all services..."
+    log "\n\nRunning docker-compose $* on all services..."
     if ! $DRYRUN; then
-        {% for service in docker_services %}
-        docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$1" #|& tee -a $LOGFILE
-        {% endfor %}
+    {% for service in docker_services %}
+    docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$@" #|& tee -a $LOGFILE
+    {% endfor %}
     fi
 }
 
@@ -261,8 +294,7 @@ evaluate_schedule()
 
     # other triggers are ignored and a notification is sent to notify the admin of unwanted behavior
     else
-        log "Script triggered at the wrong timeframe. It is $(date +%F), $(date +%T)"
-        send_email_with_logs
+        quit_script "Script triggered at the wrong timeframe. It is $(date +%F), $(date +%T)"
     fi
 }
 
@@ -277,6 +309,13 @@ if [[ $(id -u) -ne 0 ]]
 then
     echo "Please run as root!"
     exit 1
+fi
+
+# -------------------- help message? -----------------------
+
+if [[ "$1" == "--help" ]]; then
+    usage
+    exit 0
 fi
 
 
@@ -295,32 +334,79 @@ fi
 
 # create lockfile
 touch $LOCKFILE
-log "DRYRUN: $DRYRUN"
-
 
 
 
 # -------------------- evaluate arguments -----------------------
 
 
-if [[ -z $1 || $1 == "--dry-run" ]];
-then
-    evaluate_schedule
-else
-    if [[ "$1" == "--monthly" ]]; then monthly
-    elif [[ "$1" == "--daily" ]]; then daily
-    elif [[ "$1" == "--weekly" ]]; then weekly
-    elif [[ "$1" == "--backup-dockerdata" ]]; then backup_dockerdata
-    elif [[ "$1" == "--docker-up" ]]; then docker_compose_all_services up -d
-    else
-        echo "unknown parameter!"
-        rm $LOGFILE
-        rm $LOCKFILE
-        exit 1
+# check if --dry-run or --no-email is set as first argument
+
+DRYRUN_ARG="--dry-run"
+NOEMAIL_ARG="--no-email"
+while [[ "$1" == "$DRYRUN_ARG" || "$1" == "$NOEMAIL_ARG" ]]; do
+
+    if [[ "$1" == "$DRYRUN_ARG" ]]; then
+        DRYRUN=true
+        shift
     fi
+
+    if [[ "$1" == "$NOEMAIL_ARG" ]]; then
+        EMAIL=false
+        shift
+    fi
+done
+
+
+if $DRYRUN; then
+    RSYNC_CMD="rsync --dry-run"
+    BTRBK_CMD="btrbk -c $BTRBK_CONFIG -n"
+else
+    RSYNC_CMD="rsync"
+    BTRBK_CMD="btrbk -c $BTRBK_CONFIG"
 fi
 
+log "$(date +%F), $(date +%T): Script started.\n"
+
+log "DRYRUN: $DRYRUN"
+log "EMAIL: $EMAIL"
+
+
+# check if a command is passed as argument
+
+case $1 in
+    "")     # empty string
+        evaluate_schedule
+        ;;
+    daily|weekly|monthly)
+        if [[ $# -gt 1 ]]; then
+            quit_script "$1 command does not allow parameters!"
+        fi
+        ;;&     # fallthrough because of &
+    daily)
+        daily
+        ;;
+    weelky)
+        weekly
+        ;;
+    monthly)
+        monthly
+        ;;
+    docker)
+        shift
+        if [[ $# -eq 0 ]]; then
+            quit_script "docker command needs a parameter!"
+        fi
+        EMAIL=false
+        log "Deactivating email notifications for docker command."
+        docker_compose_all_services "$@"
+        ;;
+    *)
+        usage
+        quit_script "Invalid command or option: $@"
+        ;;
+esac
+
+
 log "\n\n$(date +%F), $(date +%T): SUCCESSFULLY FINISHED."
-send_email_with_logs
-rm $LOCKFILE
-exit 0
+quit_script
