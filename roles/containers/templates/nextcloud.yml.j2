@@ -23,7 +23,7 @@ services:
 
 
   nextcloud:
-    image: nextcloud:27-apache
+    image: nextcloud:{{ nextcloud_version }}
     container_name: nextcloud
     hostname: nextcloud
     restart: always
@@ -39,7 +39,7 @@ services:
       - MYSQL_HOST=nextcloud-db
 
     volumes:
-      - "{{ docker_data_dir }}/nextcloud/data:/var/www/html"
+      - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:z"
       - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data"
 
     labels:
@@ -63,6 +63,19 @@ services:
     networks:
       - traefik-net
 
+
+  cron:
+    image: nextcloud:{{ nextcloud_version }}
+    container_name: nextcloud-cron
+    restart: always
+    volumes:
+      - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:z"
+      - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data"
+    entrypoint: /cron.sh
+    depends_on:
+      - nextcloud-db
+    networks:
+      - traefik-net
 
 networks:
     traefik-net:

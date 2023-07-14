@@ -82,6 +82,9 @@ docker_services:
   - traefik
 
 
+# Nextcloud vars
+nextcloud_version: 27-apache
+
 
 # Maintenance vars
 btrbk_config_dir: /etc/btrbk/btrbk.conf
