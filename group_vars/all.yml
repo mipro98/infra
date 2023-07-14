@@ -75,7 +75,7 @@ docker_services:
   # - bookstack
   - dokuwiki
   - vaultwarden
-  # - nextcloud
+  - nextcloud
   - filebrowser
   - homer
   - gitea

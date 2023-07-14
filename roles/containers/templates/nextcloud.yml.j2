@@ -3,7 +3,7 @@ version: '2'
 services:
 
   nextcloud-db:
-    image: mariadb:10.6
+    image: mariadb:11
     container_name: nextcloud-db
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
@@ -25,6 +25,7 @@ services:
   nextcloud:
     image: nextcloud:27-apache
     container_name: nextcloud
+    hostname: nextcloud
     restart: always
     links:
       - nextcloud-db
@@ -51,6 +52,13 @@ services:
       # Redirect path for CalDAV/CardDAV:
       - "traefik.http.middlewares.nextcloud-dav.replacepathregex.regex=^/.well-known/ca(l|rd)dav"
       - "traefik.http.middlewares.nextcloud-dav.replacepathregex.replacement=/remote.php/dav/"
+      # HSTS Header https://community.traefik.io/t/http-strict-transport-security/3676
+      - "traefik.http.middlewares.nextcloud-header.headers.stsSeconds=15552000"
+      - "traefik.http.middlewares.nextcloud-header.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.nextcloud-header.headers.stsPreload=true"
+      - "traefik.http.middlewares.nextcloud-header.headers.forceSTSHeader=true"
+      # apply middleware
+      - "traefik.http.routers.nextcloud.middlewares=nextcloud-dav@docker,nextcloud-header@docker"
 
     networks:
       - traefik-net
