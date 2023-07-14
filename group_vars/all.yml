@@ -4,6 +4,8 @@ unixgroup: users
 mount_nas_drive: /mnt/NAS
 mount_backup_drive: /mnt/BACKUP
 
+size_tmpfs_ramdisk: 6G
+
 extra_packages:
   - autoconf
   - automake

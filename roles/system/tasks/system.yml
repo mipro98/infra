@@ -45,6 +45,14 @@
     opts: "defaults,noatime,compress=lzo,space_cache=v2,nofail,x-systemd.device-timeout=5s,\
           x-systemd.required-by=docker.service,x-systemd.before=docker.service,subvolid=5"
 
+- name: Enlarge tmpfs at /tmp for transcoded files.
+  ansible.posix.mount:
+    backup: true
+    path: /tmp
+    state: present
+    src: tmpfs
+    fstype: tmpfs
+    opts: rw,nodev,nosuid,size={{ size_tmpfs_ramdisk }}
 
 - name: Place .tmux.conf
   ansible.builtin.copy:
