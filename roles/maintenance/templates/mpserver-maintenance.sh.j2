@@ -140,24 +140,32 @@ update_system()
 
 # ----------------------------------------------- Docker -----------------------------------------------
 
+show_running_containers()
+{
+    log "\n\nRunning containers:"
+    log "$(docker ps --format {% raw %}'\t{{.Names}}'{% endraw %})"
+}
+
 stop_containers()
 {
     # stop all docker containers
     log "\n\nstopping containers:"
     log "$(docker ps --format {% raw %}'\t{{.Names}}'{% endraw %})"
     if ! $DRYRUN; then
-        docker stop "$(docker ps -q)"
+        # docker stop "$(docker ps -q)"   # not working for whatever reason?!??
+        docker_compose_all_services stop
     fi
+    show_running_containers
 }
 
 restart_containers()
 {
     # restart docker containers
     if ! $DRYRUN; then
-        docker start "$(docker ps -a -q)"
+        # docker start "$(docker ps -a -q)" # not working for whatever reason?!??
+        docker_compose_all_services start
     fi
-    log "\n\nRestarted containers:"
-    log "$(docker ps --format {% raw %}'\t{{.Names}}'{% endraw %})"
+    show_running_containers
 }
 
 
@@ -166,7 +174,7 @@ docker_compose_all_services()
     log "\n\nRunning docker-compose $* on all services..."
     if ! $DRYRUN; then
     {% for service in docker_services %}
-    docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$@" #|& tee -a $LOGFILE
+    docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$@" &>> /dev/null #|& tee -a $LOGFILE
     {% endfor %}
     fi
 }
@@ -175,7 +183,7 @@ docker_prune()
 {
     log "\n\nPruning docker system..."
     if ! $DRYRUN; then
-        docker system prune -af --volumes #&>> $LOGFILE
+        docker system prune -af --volumes &>> $LOGFILE
     fi
 }
 
@@ -186,8 +194,8 @@ docker_prune()
 
 backup_dockerdata()
 {
-    log "\n\nRsyncing files from dockerdata to Backup subvolumes. If errors occur, they are reported in the next line."
-    $RSYNC_CMD -Aaz --delete "${DOCKERDATA}/" "$DOCKERDATA_BKP_DIR" 2>> $LOGFILE
+    log "\n\nRsyncing files from dockerdata to Backup subvolumes."
+    $RSYNC_CMD -Aaz --stats --delete "${DOCKERDATA}/" "$DOCKERDATA_BKP_DIR" &>> $LOGFILE
 }
 
 snapshot_all()
@@ -264,6 +272,7 @@ monthly()
     # update all containers
     docker_compose_all_services pull
     docker_compose_all_services up -d
+    show_running_containers
     docker_prune
 
     run_backup
@@ -380,7 +389,7 @@ case $1 in
         ;;
     daily|weekly|monthly)
         if [[ $# -gt 1 ]]; then
-            quit_script "$1 command does not allow parameters!"
+            quit_script "$1 command does not allow parameters! Parameters passed: $*"
         fi
         ;;&     # fallthrough because of &
     daily)
