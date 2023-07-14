@@ -38,8 +38,8 @@
   become: true
   ansible.builtin.systemd:
     name: mpserver-maintenance
-    state: "started"
-    enabled: true
+    state: "stopped"  # does not have to be started and enabled since it's triggered by the timer
+    enabled: false
 
 - name: Copy systemd timer which triggers systemd service.
   become: true
