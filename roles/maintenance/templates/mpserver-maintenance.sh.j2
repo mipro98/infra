@@ -24,7 +24,7 @@
 
 DRYRUN=true
 
-LOG_TYPE="unset"
+LOG_TYPE="ERROR"
 
 # Get this script folder path
 SCRIPTDIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -132,11 +132,9 @@ docker_compose_all_services()
 {
     log "\n\nRunning docker-compose $1 on all services..."
     if ! $DRYRUN; then
-        docker-compose \
         {% for service in docker_services %}
-        -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" \
+        docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$1" #|& tee -a $LOGFILE
         {% endfor %}
-        "$1" |& tee -a $LOGFILE
     fi
 }
 
@@ -144,7 +142,7 @@ docker_prune()
 {
     log "\n\nPruning docker system..."
     if ! $DRYRUN; then
-        docker system prune -af --volumes &>> $LOGFILE
+        docker system prune -af --volumes #&>> $LOGFILE
     fi
 }
 
@@ -232,7 +230,7 @@ monthly()
 
     # update all containers
     docker_compose_all_services pull
-    docker_compose_all_services "up -d"
+    docker_compose_all_services up -d
     docker_prune
 
     run_backup
@@ -313,6 +311,7 @@ else
     elif [[ "$1" == "--daily" ]]; then daily
     elif [[ "$1" == "--weekly" ]]; then weekly
     elif [[ "$1" == "--backup-dockerdata" ]]; then backup_dockerdata
+    elif [[ "$1" == "--docker-up" ]]; then docker_compose_all_services up -d
     else
         echo "unknown parameter!"
         rm $LOGFILE

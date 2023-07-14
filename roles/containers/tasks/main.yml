@@ -37,3 +37,11 @@
     group: "{{ unixgroup }}"
     mode: '644'
   with_items: "{{ docker_services }}"
+
+- name: Copy convenience script for starting all containers
+  ansible.builtin.template:
+    src: "compose.sh.j2"
+    dest: "{{ docker_compose_dir }}/compose.sh"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: '744'
