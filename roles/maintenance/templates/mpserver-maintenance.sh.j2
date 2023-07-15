@@ -174,7 +174,7 @@ docker_compose_all_services()
     log "\n\nRunning docker-compose $* on all services..."
     if ! $DRYRUN; then
     {% for service in docker_services %}
-    docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$@" &>> /dev/null #|& tee -a $LOGFILE
+    docker-compose -f "${COMPOSE_REPO}/{{ service }}/docker-compose.yml" "$@" #&>> /dev/null #|& tee -a $LOGFILE
     {% endfor %}
     fi
 }

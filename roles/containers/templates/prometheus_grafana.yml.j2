@@ -15,8 +15,12 @@ services:
       - '--config.file=/etc/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
 
+    {% if debug_ports_open %}ports:
+       - "9090:9090"     # activate only for debugging
+    {% endif %}
+
     labels:
-      - "traefik.enable=false"
+      - "traefik.enable=false"  # disable for now, no need to be public
       - "traefik.http.routers.prometheus.rule=Host(`{{ prometheus_domain }}`)"
       - "traefik.http.routers.prometheus.entrypoints=websecure"
       - "traefik.http.routers.prometheus.tls=true"
