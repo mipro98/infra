@@ -31,6 +31,7 @@ services:
       - nextcloud-db
     depends_on:
       - nextcloud-db
+      - redis-nc
 
     environment:
       - MYSQL_PASSWORD={{ nextcloud_db_user_pw }}
@@ -67,6 +68,12 @@ services:
       - traefik-net
 
 
+  redis-nc:
+    hostname: redis-nc
+    container_name: redis-nc
+    image: redis:alpine
+    restart: always
+
   cron:
     image: nextcloud:{{ nextcloud_version }}
     container_name: nextcloud-cron
@@ -77,6 +84,7 @@ services:
     entrypoint: /cron.sh
     depends_on:
       - nextcloud-db
+      - redis-nc
     networks:
       - traefik-net
 
