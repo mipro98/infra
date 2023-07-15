@@ -13,6 +13,10 @@ maintenance:
 script:
 	ansible-playbook run.yml -t script
 
+postinstall:
+	ansible-playbook run.yml -t compose,maintenance
+
+
 # -----------------
 
 decrypt:
