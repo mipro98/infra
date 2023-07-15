@@ -81,6 +81,7 @@ docker_services:
   - homer
   - gitea
   - traefik
+  - prometheus_grafana
 
 
 # Nextcloud vars

@@ -14,6 +14,15 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
 
+      # metrics for grafana
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.buckets=0.1,0.3,1.2,5.0"
+      - "--metrics.prometheus.addrouterslabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+      - "--entryPoints.metrics.address=:8082"
+      - "--metrics.prometheus.entryPoint=metrics"
+
+
       # open ports / entrypoints
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
@@ -38,6 +47,7 @@ services:
       - "443:443"
       - "8080:8080"   # The Web UI (enabled by --api.insecure=true)
       - "8081:8081"   # for legacy nextcloud
+      #- "8082:8082"   # for metrics, only for debugging
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - "{{ docker_data_dir }}/traefik/acme.json:/acme.json"

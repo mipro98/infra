@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    hostname: prometheus
+    restart: always
+
+    volumes:
+      - "{{ docker_data_dir }}/prometheus_grafana/prometheus.yml:/etc/prometheus.yml"
+      - "{{ docker_data_dir }}/prometheus_grafana/prometheus:/prometheus" # make sure to have 777 permission on data folder because container will use weird user
+
+    command:
+      - '--config.file=/etc/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+
+    labels:
+      - "traefik.enable=false"
+      - "traefik.http.routers.prometheus.rule=Host(`{{ prometheus_domain }}`)"
+      - "traefik.http.routers.prometheus.entrypoints=websecure"
+      - "traefik.http.routers.prometheus.tls=true"
+      - "traefik.http.routers.prometheus.tls.certresolver=letsencrypt"
+
+    networks:
+      - traefik-net
+
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    hostname: grafana
+    restart: always
+    user: "{{ username_id.stdout }}:{{ unixgroup_id.stdout }}"
+
+    depends_on:
+      - prometheus
+
+    volumes:
+      - "{{ docker_data_dir }}/prometheus_grafana/grafana:/var/lib/grafana"
+
+    environment:
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`{{ grafana_domain }}`)"
+      - "traefik.http.routers.grafana.entrypoints=websecure"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+
+    networks:
+        - traefik-net
+
+networks:
+    traefik-net:
+        external: true
