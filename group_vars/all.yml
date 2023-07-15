@@ -4,8 +4,6 @@ unixgroup: users
 mount_nas_drive: /mnt/NAS
 mount_backup_drive: /mnt/BACKUP
 
-size_tmpfs_ramdisk: 6G
-
 extra_packages:
   - autoconf
   - automake
@@ -23,6 +21,7 @@ extra_packages:
   - hdparm
   - htop
   - intel-ucode
+  - intel-gpu-tools
   - iotop
   - libva-utils
   - make

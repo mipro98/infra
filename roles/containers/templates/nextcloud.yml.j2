@@ -38,6 +38,9 @@ services:
       - MYSQL_USER={{ nextcloud_db_user }}
       - MYSQL_HOST=nextcloud-db
 
+    tmpfs:
+      - /tmp:exec
+
     volumes:
       - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:z"
       - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data"
@@ -76,6 +79,24 @@ services:
       - nextcloud-db
     networks:
       - traefik-net
+
+
+  # https://github.com/pulsejet/go-vod
+  go-vod:
+    build: ./go-vod
+    hostname: go-vod
+    container_name: go-vod
+    restart: always
+    devices:
+      - /dev/dri:/dev/dri
+    tmpfs:
+      - /tmp
+    volumes:
+      - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:ro"
+      - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data:ro"
+    networks:
+      - traefik-net
+
 
 networks:
     traefik-net:
