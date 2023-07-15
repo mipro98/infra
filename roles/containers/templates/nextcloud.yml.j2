@@ -73,6 +73,8 @@ services:
     container_name: redis-nc
     image: redis:alpine
     restart: always
+    networks:
+      - traefik-net
 
   cron:
     image: nextcloud:{{ nextcloud_version }}
