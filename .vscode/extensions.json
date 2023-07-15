@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "redhat.ansible",
+        "wholroyd.jinja",
+        "wyattferguson.jinja2-snippet-kit",
+        "mads-hartmann.bash-ide-vscode",
+        "timonwong.shellcheck",
+        "redhat.vscode-yaml"
+    ]
+}
