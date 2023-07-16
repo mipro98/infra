@@ -30,7 +30,7 @@
     backup: true
     path: "{{ mount_backup_drive }}"
     state: present
-    src: UUID=cbee23ff-7a60-4aa2-911c-d4ab0890f99e
+    src: UUID={{ uuid_backup_drive }}
     fstype: btrfs
     opts: defaults,noatime,compress=lzo,space_cache=v2,nofail,x-systemd.device-timeout=5s,subvolid=5
 
@@ -40,10 +40,14 @@
     backup: true
     path: "{{ mount_nas_drive }}"  # remember this is hardcoded in the compose files also!
     state: mounted
-    src: UUID=0bdf23c9-940f-42a8-a763-288bc77f8dd7
+    src: UUID={{ uuid_nas_drive }}
     fstype: btrfs
     opts: "defaults,noatime,compress=lzo,space_cache=v2,nofail,x-systemd.device-timeout=5s,\
           x-systemd.required-by=docker.service,x-systemd.before=docker.service,subvolid=5"
+
+# - name: Setup smartd config file
+#   ansible.builtin.lineinfile:
+
 
 - name: Place .tmux.conf
   ansible.builtin.copy:
@@ -61,7 +65,19 @@
     owner: root
     group: root
     mode: '600'
-  notify: Send test email.
+  notify: Send test email with mutt.
+
+
+- name: Setup email for system notifications with msmtp
+  ansible.builtin.template:
+    src: msmtprc.j2
+    dest: /root/.msmtprc
+    owner: root
+    group: root
+    mode: '600'
+  notify: Send test email with msmtp.
+
+
 
 - name: Ensure docker service is running.
   ansible.builtin.systemd:

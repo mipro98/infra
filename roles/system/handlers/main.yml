@@ -1,7 +1,16 @@
-- name: Send test email.
+- name: Send test email with mutt.
   become: true      # use root account for sending mails
   ansible.builtin.shell:
     cmd: "set -o pipefail && \
           echo \"This is a test email after configuring the server. If you receive this email, it is working!\" |\
           mutt -s \"Server is setup for Email notifications!\" \"{{ email_testmail_receiver }}\""
     removes: /root/.muttrc  # only run if mutt config is present
+
+
+- name: Send test email with msmtp.
+  become: true      # use root account for sending mails
+  ansible.builtin.shell:
+    cmd: "set -o pipefail && \
+          echo \"This is a test email for system notifications. If you receive this email, it is working!\" |\
+          mail -s \"System alerts are working on your server!\" \"{{ email_testmail_receiver }}\""
+    removes: /root/.msmtprc  # only run if config is present

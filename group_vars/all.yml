@@ -2,7 +2,11 @@ username: mp
 unixgroup: users
 
 mount_nas_drive: /mnt/NAS
+uuid_nas_drive: 0bdf23c9-940f-42a8-a763-288bc77f8dd7
+
 mount_backup_drive: /mnt/BACKUP
+uuid_backup_drive: cbee23ff-7a60-4aa2-911c-d4ab0890f99e
+
 
 extra_packages:
   - autoconf
@@ -46,6 +50,9 @@ extra_packages:
   - wget
   - wol
   - zsh-completions
+  - msmtp
+  - msmtp-mta
+  - s-nail
 
 
 # SSH vars

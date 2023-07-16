@@ -1,0 +1,15 @@
+defaults
+auth           on
+tls            on
+#logfile        ~/.msmtp.log
+
+account        systemaccount
+host           {{ smtp_server_addr }}
+port           465
+tls_starttls   off
+from           {{ smtp_sender_addr }}
+user           {{ smtp_user }}
+password       {{ smtp_pass }}
+
+# Set a default account
+account default : systemaccount
