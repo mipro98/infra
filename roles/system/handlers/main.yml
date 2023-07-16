@@ -14,3 +14,9 @@
           echo \"This is a test email for system notifications. If you receive this email, it is working!\" |\
           mail -s \"System alerts are working on your server!\" \"{{ email_testmail_receiver }}\""
     removes: /root/.msmtprc  # only run if config is present
+
+- name: Restart smartd systemd service on configuration change.
+  ansible.builtin.systemd:
+    name: smartd
+    state: "restarted"
+    enabled: true

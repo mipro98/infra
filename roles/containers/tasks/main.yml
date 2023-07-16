@@ -46,7 +46,8 @@
     mode: '644'
   with_items: "{{ docker_services }}"
 
-- name: Copy convenience script for starting all containers
+# ATTENTION!! needs to be replaced: "Using a variable in the content field will result in unpredictable output."
+- name: Copy convenience script for starting all containers (MAY BE BROKEN!!)
   ansible.builtin.copy:
     content: "#!/bin/bash\nsudo bash /home/{{ username }}/maintenance/mpserver-maintenance.sh docker \"$@\""
     dest: "{{ docker_compose_dir }}/compose.sh"

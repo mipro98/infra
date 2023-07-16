@@ -45,9 +45,22 @@
     opts: "defaults,noatime,compress=lzo,space_cache=v2,nofail,x-systemd.device-timeout=5s,\
           x-systemd.required-by=docker.service,x-systemd.before=docker.service,subvolid=5"
 
-# - name: Setup smartd config file
-#   ansible.builtin.lineinfile:
+- name: Setup smartd config file.
+  ansible.builtin.template:
+    src: smartd.conf.j2
+    dest: /etc/smartd.conf
+    backup: true
+    owner: root
+    group: root
+    mode: '644'
+    validate: smartd -q onecheck -c %s
+  notify: Restart smartd systemd service on configuration change.
 
+- name: Enable smartd systemd service.
+  ansible.builtin.systemd:
+    name: smartd
+    state: "started"
+    enabled: true
 
 - name: Place .tmux.conf
   ansible.builtin.copy:
