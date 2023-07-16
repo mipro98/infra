@@ -128,7 +128,7 @@ update_system()
     # update system
     if checkupdates &> /dev/null; then
         log "\n\nupdates available:"
-        log "$(checkupdates)"
+        log "$(checkupdates)\n"
         if ! $DRYRUN; then
             pacman -Syu --noconfirm &>> $LOGFILE
         fi
@@ -194,8 +194,10 @@ docker_prune()
 
 backup_dockerdata()
 {
+    sync # wait for all changes to be committed to disk
     log "\n\nRsyncing files from dockerdata to Backup subvolumes."
     $RSYNC_CMD -Aaz --stats --delete "${DOCKERDATA}/" "$DOCKERDATA_BKP_DIR" &>> $LOGFILE
+    sync # commit all changes to disk. (Maybe consider using btrfs filesystem sync OR btrfs subvolume sync instead?)
 }
 
 snapshot_all()
