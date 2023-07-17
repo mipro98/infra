@@ -379,6 +379,7 @@ fi
 
 log "$(date +%F), $(date +%T): Script started.\n"
 
+log "cmd arguments passed:"
 log "DRYRUN: $DRYRUN"
 log "EMAIL: $EMAIL"
 
@@ -395,6 +396,7 @@ case $1 in
         fi
         ;;&     # fallthrough because of &
     daily)
+        EMAIL=false # don't send email on daily
         daily
         ;;
     weelky)
