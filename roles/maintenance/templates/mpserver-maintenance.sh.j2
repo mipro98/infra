@@ -301,7 +301,9 @@ evaluate_schedule()
     elif [[ $(date +%a) == "Sun" ]]; then weekly
 
     # DAILY: Every day between 0h and 6h a.m.
-    elif [ "$(date +%H)" -ge 0 ] && [ "$(date +%H)" -le 6 ]; then daily
+    elif [ "$(date +%H)" -ge 0 ] && [ "$(date +%H)" -le 6 ]; then
+        EMAIL=false # don't send email on daily
+        daily
 
     # other triggers are ignored and a notification is sent to notify the admin of unwanted behavior
     else
@@ -396,7 +398,6 @@ case $1 in
         fi
         ;;&     # fallthrough because of &
     daily)
-        EMAIL=false # don't send email on daily
         daily
         ;;
     weelky)
