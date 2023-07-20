@@ -103,9 +103,13 @@ quit_script()
 # ----------------------------------------------- System -----------------------------------------------
 
 
+#This function returns exit codes: 0 = found, 1 = not found
+isMounted() {   findmnt "$1" >/dev/null; } #device or path
+
+
 mount_backup_drive()
 {
-    if findmnt $MOUNT_BKP_DRIVE > /dev/null
+    if isMounted $MOUNT_BKP_DRIVE > /dev/null
     then
         log "$MOUNT_BKP_DRIVE was already mounted!"
     else
@@ -247,15 +251,22 @@ weekly()
     LOG_TYPE="Weekly"
 
     mount_backup_drive
+
     stop_containers
     backup_dockerdata
     snapshot_all
     restart_containers
-    run_backup
 
-    # unmount backup drive
-    sync
-    umount $MOUNT_BKP_DRIVE
+    if isMounted "$MOUNT_BKP_DRIVE"; then
+        run_backup
+        # unmount backup drive
+        sync
+        umount $MOUNT_BKP_DRIVE
+    else
+        log "\n\n###################################################################"
+        log "ERROR!! ~~~~~~ BACKUP DRIVE NOT MOUNTED! ~~~~~~ SKIPPING BACKUP!"
+        log "###################################################################\n\n"
+    fi
 
     update_system
 }
@@ -277,14 +288,22 @@ monthly()
     show_running_containers
     docker_prune
 
-    run_backup
+    if isMounted "$MOUNT_BKP_DRIVE"; then
+        run_backup
+    else
+        log "\n\n###################################################################"
+        log "ERROR!! ~~~~~~ BACKUP DRIVE NOT MOUNTED! ~~~~~~ SKIPPING BACKUP AND SCRUBBING!"
+        log "###################################################################\n\n"
+    fi
 
     scrub $MOUNT_NAS
-    scrub $MOUNT_BKP_DRIVE
 
-    # unmount backup drive
-    sync
-    umount $MOUNT_BKP_DRIVE
+    if isMounted "$MOUNT_BKP_DRIVE"; then
+        scrub $MOUNT_BKP_DRIVE
+        # unmount backup drive
+        sync
+        umount $MOUNT_BKP_DRIVE
+    fi
 
     update_system
 }
@@ -383,6 +402,10 @@ log "cmd arguments passed:"
 log "DRYRUN: $DRYRUN"
 log "EMAIL: $EMAIL"
 
+# check if NAS drive is mounted
+if ! isMounted "$MOUNT_NAS"; then
+    quit_script "NAS drive not mounted! ABORTING!"
+fi
 
 # check if a command is passed as argument
 
@@ -399,7 +422,7 @@ case $1 in
         EMAIL=false # don't send email on daily
         daily
         ;;
-    weelky)
+    weekly)
         weekly
         ;;
     monthly)
