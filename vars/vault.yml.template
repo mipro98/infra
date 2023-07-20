@@ -1,0 +1,50 @@
+# MUTT config
+
+smtp_pass: PASSWORD
+smtp_user: USERNAME
+smtp_sender_name: Name Surname
+smtp_sender_addr: server@domain.org
+smtp_server_addr: smtp.domain.org
+email_testmail_receiver: test@alertdomain.com
+
+email_alerts_receiver: server-alerts@alertdomain.com
+
+
+#
+# #########    Docker Service-specific variables    #########
+#
+
+# Bookstack
+bookstack_domain: bookstack.mydomain.com
+bookstack_db_root_pw: MYROOTPW
+bookstack_db_user_pw: MYUSERPW
+bookstack_db_user: MYBOOKSTACKUSER
+
+# Dokuwiki
+dokuwiki_domain: dokuwiki.mydomain.com
+
+# Filebrowser
+filebrowser_domain: filebrowser.mydomain.com
+
+# Gitea
+gitea_domain: gitea.mydomain.com
+gitea_ssh_port: 46149
+
+# Homer
+homer_domain: homer.mydomain.com
+homer_login: Username:HashedPW
+
+# Nextcloud
+nextcloud_domain: nextcloud.mydomain.com
+nextcloud_db_user: MYNEXTCLOUDUSER
+nextcloud_db_user_pw: DBUSERPW
+nextcloud_db_root_pw: DBROOTPW
+
+# Vaultwarden
+vaultwarden_domain: vaultwarden.mydomain.com
+
+# Prometheus
+prometheus_domain: prometheus.mydomain.com
+
+# Grafana
+grafana_domain: grafana.mydomain.com
