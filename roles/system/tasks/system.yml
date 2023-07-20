@@ -95,3 +95,13 @@
     name: "docker"
     state: "started"
     enabled: true
+
+- name: Change DNS servers for docker (since otherwise downloads in containers might fail because of weird bug) https://stackoverflow.com/a/68199803
+  become: true
+  ansible.builtin.copy:
+    content: "{ \"dns\": [\"8.8.8.8\", \"9.9.9.9\"] }"
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart docker daemon.
