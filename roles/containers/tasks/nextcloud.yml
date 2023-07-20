@@ -1,0 +1,25 @@
+---
+
+- name: Ensure the repo go-vod exists in case nextcloud is configured.
+  ansible.builtin.git:
+    repo: 'https://github.com/pulsejet/go-vod'
+    dest: "{{ docker_compose_dir }}/nextcloud/go-vod"
+    update: false
+
+- name: Setup custom Dockerfile for nextcloud to have ffmpeg in Nextcloud container.
+  ansible.builtin.template:
+    src: "Dockerfile-nextcloud.j2"
+    dest: "{{ docker_compose_dir }}/nextcloud/Dockerfile"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0644"
+
+
+- name: Populate crontab file for Nextcloud cron container.
+  become: true
+  ansible.builtin.copy:
+    src: crontab-www-data
+    dest: "{{ docker_compose_dir }}/nextcloud/crontab-www-data"
+    owner: root
+    group: root
+    mode: "0644"

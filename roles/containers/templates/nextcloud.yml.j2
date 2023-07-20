@@ -23,7 +23,8 @@ services:
 
 
   nextcloud:
-    image: nextcloud:{{ nextcloud_version }}
+    #image: nextcloud:{{ nextcloud_version }}
+    build: .
     container_name: nextcloud
     hostname: nextcloud
     restart: always
@@ -84,6 +85,7 @@ services:
     volumes:
       - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:z"
       - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data"
+      - ./crontab-www-data:/var/spool/cron/crontabs/www-data
     entrypoint: /cron.sh
     depends_on:
       - nextcloud-db

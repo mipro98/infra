@@ -17,14 +17,6 @@
     mode: "0755"
   with_items: "{{ docker_services }}"
 
-
-- name: Ensure the repo go-vod exists in case nextcloud is configured.
-  ansible.builtin.git:
-    repo: 'https://github.com/pulsejet/go-vod'
-    dest: "{{ docker_compose_dir }}/nextcloud/go-vod"
-    update: false
-  when: '"nextcloud" in docker_services'
-
 - name: Get UID for user "{{ username }}" from shell (to be used later in compose templates).
   become: false
   ansible.builtin.shell:
@@ -54,3 +46,7 @@
     owner: "{{ username }}"
     group: "{{ unixgroup }}"
     mode: '744'
+
+- name: include nextcloud setup tasks
+  include_tasks: nextcloud.yml
+  when: '"nextcloud" in docker_services'
