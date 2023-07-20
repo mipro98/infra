@@ -1,4 +1,4 @@
-# MUTT config
+# EMAIL config
 
 smtp_pass: PASSWORD
 smtp_user: USERNAME
@@ -28,7 +28,7 @@ filebrowser_domain: filebrowser.mydomain.com
 
 # Gitea
 gitea_domain: gitea.mydomain.com
-gitea_ssh_port: 46149
+gitea_ssh_port: 6969
 
 # Homer
 homer_domain: homer.mydomain.com
