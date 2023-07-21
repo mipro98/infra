@@ -40,6 +40,11 @@ nextcloud_db_user: MYNEXTCLOUDUSER
 nextcloud_db_user_pw: DBUSERPW
 nextcloud_db_root_pw: DBROOTPW
 
+# Collabora
+collabora_domain: collabora.mydomain.com
+collabora_user: USER
+collabora_pw: PASSWD
+
 # Vaultwarden
 vaultwarden_domain: vaultwarden.mydomain.com
 

@@ -111,6 +111,32 @@ services:
       - traefik-net
 
 
+  collabora:
+    image: collabora/code
+    container_name: collabora
+    hostname: collabora
+    restart: always
+    cap_add:
+      - MKNOD
+    environment:
+      - aliasgroup1={{ nextcloud_domain }}
+      - username={{ collabora_user }}
+      - password={{ collabora_pw }}
+      - "extra_params=--o:ssl.enable=false --o:ssl.termination=true"
+
+    networks:
+      - traefik-net
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.collabora.tls=true"
+      - "traefik.http.routers.collabora.rule=Host(`{{ collabora_domain }}`)"
+      - "traefik.http.routers.collabora.entrypoints=websecure"
+      - "traefik.http.routers.collabora.tls.certresolver=letsencrypt"
+      - "traefik.http.services.collabora.loadbalancer.server.port=9980"
+
+
+
 networks:
     traefik-net:
         external: true
