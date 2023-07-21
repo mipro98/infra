@@ -1,26 +1,37 @@
-# mipro98/infra
+<h1 align=center>🖴 mipro98/infra 🖴</h1>
+<h3 align=center>An Ansible playbook for a docker-based homelab with automatic maintenance and monitoring.</h3>
 
-This repo contains the setup for my homeserver running various docker services and maintaining a BTRFS NAS storage. This playbook includes automatic setup for:
-  * Setting up the host system (packages, user, mounts,...).
-  * Deploying all docker services according to their docker-compose templates.
-  * Setting up fully automatic maintenance tasks like:
-    * BTRFS snapshots and backups to a different drive using the [btrbk utility](https://digint.ch/btrbk/)
-    * BTRFS scrubbing
-    * S.M.A.R.T. monitoring with email notifications
-    * automatic system and container updates.
+---
+
+<h4 align=center>Flexible docker-compose templates for various services like Nexcloud, Vaultwarden, Gitea, Prometheus+Grafana,...</h4>
+<h4 align=center>All services are set up ready-to-use with a Traefik reverse proxy and automatic TLS certificates.</h4>
+<h4 align=center>Automatic server maintenance with auto updates, S.M.A.R.T monitoring, BTRFS snapshots and email notifications.</h4>
+
+---
+
+## Features
+
+This playbook includes tasks for:
+* Setting up the host system (packages, user, mounts,...).
+* Deploying all docker services according to their docker-compose templates.
+* Setting up fully automatic maintenance tasks like:
+  * BTRFS snapshots and backups to a different drive using the [btrbk utility](https://digint.ch/btrbk/)
+  * BTRFS scrubbing
+  * S.M.A.R.T. monitoring with email notifications
+  * automatic system and container updates.
 
 
 Various configuration can be done using variables defined in `group_vars` or in `vault.yml`. For almost all files, [templates](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/template_module.html) are used to craft configuration files or docker-compose.yml files according to set variables.
 
 
-**This repo contains ready-to-use container setups for:**
+<u>**This repo contains ready-to-use container setups for:**</u>
 * Nextcloud ([with Mariadb, Redis, Cron, Collabora, Memories incl. hardware transcoding](#nextcloud-stack))
 * A server monitoring stack with [Prometheus](https://prometheus.io/), [Grafana](https://grafana.com/) and [node_exporter](https://github.com/prometheus/node_exporter).
 * Dokuwiki
 * Gitea
 * Homer
 * Vaultwarden
-* Traefik v2 as the central reverse proxy
+* Traefik v2 as the central reverse proxy.
 
 **_All these services are setup to be exposed through Traefik on differnt domains by simply providing domain names for the services in `vault.yml`._**
 
@@ -44,7 +55,7 @@ make deploy
 
 ## Ansible-Vault
 
-This repo uses ansible-vault to encrypt secret variables used by Ansible (passwords, domain names, etc.). This affects the file `vars/vault.yml`. A template for `vault.yml` can be find in `vars/vaul.yml.template` The password for the encryption is obtained by [bitwarden-cli](https://github.com/bitwarden/cli) in the script `vault-pass.sh`. Therefore you can encrypt and decrypt by just entering your bitwarden master password by just writing:
+This repo uses ansible-vault to encrypt secret variables used by Ansible (passwords, domain names, etc.). This affects the file `vars/vault.yml`. A template for `vault.yml` can be find in `vars/vault.yml.template` The password for the encryption is obtained by [bitwarden-cli](https://github.com/bitwarden/cli) in the script `vault-pass.sh`. Therefore you can encrypt and decrypt by just entering your bitwarden master password by just writing:
 
 ```bash
 make encrypt
@@ -64,7 +75,6 @@ The repo contains 3 ansible roles:
 
 ### `system` role
 
-The system role:
   * installs all packages defined in `extra_packages`
   * sets correct permissions for docker
   * sets fstab mount points for a "NAS" and a "BACKUP" drive
@@ -74,8 +84,6 @@ _Note:_ SSH configuration is skipped for now.
 
 
 ### `container` role
-
-The container role:
 
 * Creates the folder structure for docker-compose files according to enabled services
 * Deploys the docker-compose.yml templates for the services in their respective folders
@@ -126,7 +134,7 @@ The tasks are defined in the bash functions `weekly`, `monthly`, `daily`. Each t
 ## Nextcloud stack
 
 
-The Nextcloud stack is fine-tuned for performance and simplicity using:
+The Nextcloud stack is carefully fine-tuned for performance and simplicity using:
 
 * A custom built Nextcloud image with `ffmpeg`, `imagemagick` and `ghostscript` for media previews.
 * **MariaDB** for a performant database
@@ -140,12 +148,12 @@ The Nextcloud stack is fine-tuned for performance and simplicity using:
 * The nextcloud container will _not_ auto-update unless you run `docker-compose build --pull nextcloud` inside `~/docker/nextcloud` because the container is built using `~/docker/nextcloud/Dockerfile` in order to have ffmpeg support. Since Nextcloud updates often require manual intervention and can easily be discovered through the admin panel, this isn't that much of an issue.
 * The [go-vod](https://github.com/pulsejet/go-vod) container needs to be built from the (locally cloned) github repository. Ansible takes care of cloning the go-vod repository from github in the right place when executing the `containers` role.
 * I use [Nextcloud Memories](https://memories.gallery/) alongside [Preview Generator](https://apps.nextcloud.com/apps/previewgenerator) and [Recognize](https://apps.nextcloud.com/apps/recognize) without issues and with hardware transcoding using the seperate go-vod instance. To make it work, adjust the following in the _Memories_ Admin GUI:
-  * enable "Images", "HEIC" and "Videos" unser "File Support"
+  * enable "Images", "HEIC" and "Videos" under "File Support"
   * define `/usr/bin/ffmpeg` / `/usr/bin/ffprobe` as ffmpeg / ffprobe path
   * enable "external transcoder" and just write `go-vod:47788` under "Connection address" _(The Traefik DNS will resolve `go-vod` correctly within the docker proxy network)_.
-  * tick "Enable acceleration with VA-API" on _(ignore the warning "VA-API device not found")_
+  * tick "Enable acceleration with VA-API" to <u>on</u>. _(ignore the warning "VA-API device not found")_
   * (note that I added the cronjob for preview generator in the mounted `crontab-www-data` file.)
-* **To enter the Nextcloud container, run:**
+* **To enter the Nextcloud container** (e.g. to run `occ` commands), **run:**
     ```bash
     docker exec -itu www-data nextcloud bash
     ```
@@ -155,7 +163,7 @@ The Nextcloud stack is fine-tuned for performance and simplicity using:
 ## Tips
 
 
-* The `Makefile` supports shorthands for often used ansible commands. For example, when only modifying `mpserver-maintenance.sh`, just run `make script` and it will only replace the script on the server
+* The `makefile` supports shorthands for often used Ansible commands. For example, when only modifying `mpserver-maintenance.sh`, just run `make script` and it will only replace the script on the server.
 * Under **`~/docker/copose.sh`**, there exists a **convenience script for docker-compose** where you can execute actions on **all** containers at once. For example:
     ```bash
     ./compose down
@@ -170,6 +178,6 @@ The Nextcloud stack is fine-tuned for performance and simplicity using:
 
 ## Credits
 
-A large portion of the repository is inspired by [Alex Kretzschmar's infra repo](https://github.com/ironicbadger/infra) as well as [Wolfgang notthebee's infra repo](https://github.com/notthebee/infra). Also, the BTRFS maintenance and system setup was largely inspired by [zilexa's Homeserver Guide](https://github.com/zilexa/Homeserver).
+A large portion of the repository is inspired by [Alex Kretzschmar's infra repo](https://github.com/ironicbadger/infra) as well as [Wolfgang notthebee's infra repo](https://github.com/notthebee/infra). Also, both BTRFS maintenance and the system setup was largely inspired by [zilexa's Homeserver Guide](https://github.com/zilexa/Homeserver).
 
 Thanks also goes to [Jeff Geerling's security role](https://github.com/geerlingguy/ansible-role-security) where I took almost all of my (not yet activated) SSH configuration.
