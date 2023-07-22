@@ -94,6 +94,7 @@ docker_services:
   - traefik
   - prometheus_grafana
   - node_exporter
+  # - jellyfin
 
 
 # Nextcloud vars

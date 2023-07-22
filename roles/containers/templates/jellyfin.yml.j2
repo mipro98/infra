@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+
+  jellyfin:
+    image: jellyfin/jellyfin
+    restart: always
+    container_name: jellyfin
+    hostname: jellyfin
+    user: "{{ username_id.stdout }}:{{ unixgroup_id.stdout }}"    # dynamically obtained UID/GID using ansible
+
+    volumes:
+      - "{{ docker_data_dir }}/jellyfin/config:/config"
+      - "{{ docker_data_dir }}/jellyfin/cache:/cache"
+      - "{{ mount_nas_drive }}/Filme:/media-movies"
+      - "{{ mount_nas_drive }}/Musik:/media-music"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`{{ jellyfin_domain }}`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.tls=true"
+      - "traefik.http.routers.jellyfin.tls.certresolver=letsencrypt"
+      # we want basic auth for setup!
+      - "traefik.http.middlewares.temp-auth.basicauth.users={{ homer_login }}"
+      - "traefik.http.routers.jellyfin.middlewares=temp-auth@docker"
+
+    networks:
+      - traefik-net
+
+networks:
+    traefik-net:
+        external: true
+
