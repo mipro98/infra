@@ -32,6 +32,7 @@ gitea_ssh_port: 6969
 
 # Homer
 homer_domain: homer.mydomain.com
+homer_lan_port: 4242    # lan-internal port bypassing reverse proxy (without basic auth!)
 homer_login: Username:HashedPW
 
 # Nextcloud

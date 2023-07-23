@@ -12,6 +12,9 @@ services:
       - "{{ docker_data_dir }}/homer:/www/assets"
     #   - ./config.yml:/www/assets/config.yml
 
+    ports:
+      - "{{ homer_lan_port }}:8080"
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.homer.rule=Host(`{{ homer_domain }}`)"
