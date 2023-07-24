@@ -245,7 +245,9 @@ daily()
 
     local btrbk_exit=$?
     if [ $btrbk_exit -ne 0 ]; then
-        log "btrbk failed to create snapshot of Daten subvolume with exit code: $btrbk_exit"
+        log "\n\n###################################################################"
+        log "ERROR!! btrbk failed to create snapshot of Daten subvolume with exit code: $btrbk_exit"
+        log "###################################################################\n\n"
         EMAIL=true      # always notify for error!
         LOG_TYPE="ERROR"
     fi
@@ -453,6 +455,9 @@ case $1 in
         ;;
 esac
 
-
-log "\n\n$(date +%F), $(date +%T): SUCCESSFULLY FINISHED."
+if [ $LOG_TYPE == "ERROR" ]; then
+    log "\n\n$(date +%F), $(date +%T): FINISHED WITH ERRORS!"
+else
+    log "\n\n$(date +%F), $(date +%T): SUCCESSFULLY FINISHED."
+fi
 quit_script
