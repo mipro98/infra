@@ -242,6 +242,13 @@ daily()
     # make a snapshot of "Daten" subvolume
     log "Creating snapshot of 'Daten' subvolume."
     $BTRBK_CMD --preserve snapshot Daten &>> $LOGFILE
+
+    local btrbk_exit=$?
+    if [ $btrbk_exit -ne 0 ]; then
+        log "btrbk failed to create snapshot of Daten subvolume with exit code: $btrbk_exit"
+        EMAIL=true      # always notify for error!
+        LOG_TYPE="ERROR"
+    fi
 }
 
 weekly()
@@ -266,6 +273,7 @@ weekly()
         log "\n\n###################################################################"
         log "ERROR!! ~~~~~~ BACKUP DRIVE NOT MOUNTED! ~~~~~~ SKIPPING BACKUP!"
         log "###################################################################\n\n"
+        LOG_TYPE="ERROR"
     fi
 
     update_system
@@ -294,7 +302,8 @@ monthly()
         log "\n\n###################################################################"
         log "ERROR!! ~~~~~~ BACKUP DRIVE NOT MOUNTED! ~~~~~~ SKIPPING BACKUP AND SCRUBBING!"
         log "###################################################################\n\n"
-    fi
+        LOG_TYPE="ERROR"
+   fi
 
     scrub $MOUNT_NAS
 
