@@ -33,7 +33,7 @@ Various configuration can be done using variables defined in `group_vars` or in 
 * Vaultwarden
 * Traefik v2 as the central reverse proxy.
 
-**_All these services are setup to be exposed through Traefik on differnt domains by simply providing domain names for the services in `vault.yml`._**
+**_All these services are setup to be exposed through Traefik on different domains by simply providing domain names for the services in `vault.yml`._**
 
 ## Quick start
 
@@ -55,7 +55,7 @@ make deploy
 
 ## Ansible-Vault
 
-This repo uses ansible-vault to encrypt secret variables used by Ansible (passwords, domain names, etc.). This affects the file `vars/vault.yml`. A template for `vault.yml` can be find in `vars/vault.yml.template` The password for the encryption is obtained by [bitwarden-cli](https://github.com/bitwarden/cli) in the script `vault-pass.sh`. Therefore you can encrypt and decrypt by just entering your bitwarden master password by just writing:
+This repo uses ansible-vault to encrypt secret variables used by Ansible (passwords, domain names, etc.). This affects the file `vars/vault.yml`. A template for `vault.yml` can be found in `vars/vault.yml.template` The password for the encryption is obtained by [bitwarden-cli](https://github.com/bitwarden/cli) in the script `vault-pass.sh`. Therefore you can encrypt and decrypt by just entering your bitwarden master password by just writing:
 
 ```bash
 make encrypt
@@ -104,12 +104,30 @@ Refer to section [Automatic Maintenance](#automatic-maintenance) for more detail
 The custom bash script `mpserver-maintenance.sh` gets triggered every night at 2 A.M. by systemd. Based on the time (or command line flags), it decides what actions to take:
 
 * monthly tasks _(when script is triggered on last sunday of a month)_
-* daily tasks _(when script is triggered on a sunday except the last sunday of a month)_
-* weekly tasks _(when triggered all other days between 0 A.M. and 6 A.M.)_
+* weekly tasks _(when script is triggered on a sunday except the last sunday of a month)_
+* daily tasks _(when triggered all other days between 0 A.M. and 6 A.M.)_
 
 The script can be triggered manually for daily, monthly or weekly tasks. Refer to `sudo ./mpserver-maintenance.sh --help`.
 
+```
+Usage: ./mpserver-maintenance.sh [<options>] [<command>]
+
+Options:
+	--dry-run	Don't execute anything, only show what would be executed
+	--no-email	Don't send an email with the log
+	--help		Show this help message and exit.
+
+Commands:
+	daily		Run daily maintenance tasks
+	weekly		Run weekly maintenance tasks
+	monthly	Run monthly maintenance tasks
+	docker <cmd>	Run docker-compose <cmd> on all services
+
+	If no command is passed, the script will determine the correct schedule and run the appropriate tasks.
+```
+
 The tasks are defined in the bash functions `weekly`, `monthly`, `daily`. Each trigger writes a detailed log into `~/maintenance/logs` which also gets emailed for `monthly` and `weekly` triggers.
+
 
 **Daily tasks**:
 1. Snapshot the subvolume "Daten" through btrbk
@@ -164,7 +182,7 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 
 
 * The `makefile` supports shorthands for often used Ansible commands. For example, when only modifying `mpserver-maintenance.sh`, just run `make script` and it will only replace the script on the server.
-* Under **`~/docker/copose.sh`**, there exists a **convenience script for docker-compose** where you can execute actions on **all** containers at once. For example:
+* Under **`~/docker/compose.sh`**, there exists a **convenience script for docker-compose** where you can execute actions on **all** containers at once. For example:
     ```bash
     ./compose down
     ./compose up -d
