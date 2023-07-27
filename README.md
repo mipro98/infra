@@ -55,7 +55,7 @@ make deploy
 
 ## Ansible-Vault
 
-This repo uses ansible-vault to encrypt secret variables used by Ansible (passwords, domain names, etc.). This affects the file `vars/vault.yml`. A template for `vault.yml` can be find in `vars/vault.yml.template` The password for the encryption is obtained by [bitwarden-cli](https://github.com/bitwarden/cli) in the script `vault-pass.sh`. Therefore you can encrypt and decrypt by just entering your bitwarden master password by just writing:
+This repo uses ansible-vault to encrypt secret variables used by Ansible (passwords, domain names, etc.). This affects the file `vars/vault.yml`. A template for `vault.yml` can be found in `vars/vault.yml.template` The password for the encryption is obtained by [bitwarden-cli](https://github.com/bitwarden/cli) in the script `vault-pass.sh`. Therefore you can encrypt and decrypt by just entering your bitwarden master password by just writing:
 
 ```bash
 make encrypt
@@ -104,8 +104,8 @@ Refer to section [Automatic Maintenance](#automatic-maintenance) for more detail
 The custom bash script `mpserver-maintenance.sh` gets triggered every night at 2 A.M. by systemd. Based on the time (or command line flags), it decides what actions to take:
 
 * monthly tasks _(when script is triggered on last sunday of a month)_
-* daily tasks _(when script is triggered on a sunday except the last sunday of a month)_
-* weekly tasks _(when triggered all other days between 0 A.M. and 6 A.M.)_
+* weekly tasks _(when script is triggered on a sunday except the last sunday of a month)_
+* daily tasks _(when triggered all other days between 0 A.M. and 6 A.M.)_
 
 The script can be triggered manually for daily, monthly or weekly tasks. Refer to `sudo ./mpserver-maintenance.sh --help`.
 
