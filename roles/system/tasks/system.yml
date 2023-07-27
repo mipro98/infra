@@ -1,5 +1,10 @@
 ---
 
+- name: Make sure docker group exists.
+  ansible.builtin.group:
+    name: docker
+    state: present
+
 - name: Create login user {{ username }}
   ansible.builtin.user:
     name: "{{ username }}"
@@ -95,6 +100,12 @@
     name: "docker"
     state: "started"
     enabled: true
+
+- name: Create /etc/docker directory.
+  become: true
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
 
 - name: Change DNS servers for docker (since otherwise downloads in containers might fail because of weird bug) https://stackoverflow.com/a/68199803
   become: true
