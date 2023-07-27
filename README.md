@@ -182,7 +182,7 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 
 
 * The `makefile` supports shorthands for often used Ansible commands. For example, when only modifying `mpserver-maintenance.sh`, just run `make script` and it will only replace the script on the server.
-* Under **`~/docker/copose.sh`**, there exists a **convenience script for docker-compose** where you can execute actions on **all** containers at once. For example:
+* Under **`~/docker/compose.sh`**, there exists a **convenience script for docker-compose** where you can execute actions on **all** containers at once. For example:
     ```bash
     ./compose down
     ./compose up -d
