@@ -21,6 +21,12 @@
     state: "restarted"
     enabled: true
 
+- name: Restart fail2ban systemd service on configuration change.
+  ansible.builtin.systemd:
+    name: fail2ban
+    state: "restarted"
+    enabled: true
+
 - name: Restart docker daemon.
   ansible.builtin.systemd:
     name: docker

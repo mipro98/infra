@@ -1,0 +1,17 @@
+[DEFAULT]
+
+ignoreip = 127.0.0.1/8 ::1 10.0.0.1/16 192.168.0.1/16
+bantime  = {{ fail2ban_bantime }}
+findtime  = {{ fail2ban_findtime }}
+maxretry = {{ fail2ban_maxretry }}
+
+destemail = {{ email_alerts_receiver }}
+sender = {{ smtp_sender_addr }}
+action = %(action_mwl)s
+
+
+[sshd]
+enabled = true
+port    = {{ security_ssh_port }}
+logpath = %(sshd_log)s
+backend = %(sshd_backend)s

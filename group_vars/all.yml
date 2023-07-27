@@ -53,6 +53,7 @@ extra_packages:
   - msmtp
   - msmtp-mta
   - s-nail
+  - fail2ban
 
 
 # SSH vars
@@ -72,6 +73,11 @@ security_ssh_challenge_response_auth: "no"
 security_ssh_x11_forwarding: "no"
 
 security_sshd_state: started
+
+
+fail2ban_bantime: 1h
+fail2ban_findtime: 10m
+fail2ban_maxretry: 5
 
 
 # Docker vars
