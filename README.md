@@ -33,7 +33,7 @@ Various configuration can be done using variables defined in `group_vars` or in 
 * Vaultwarden
 * Traefik v2 as the central reverse proxy.
 
-**_All these services are setup to be exposed through Traefik on differnt domains by simply providing domain names for the services in `vault.yml`._**
+**_All these services are setup to be exposed through Traefik on different domains by simply providing domain names for the services in `vault.yml`._**
 
 ## Quick start
 
@@ -109,7 +109,25 @@ The custom bash script `mpserver-maintenance.sh` gets triggered every night at 2
 
 The script can be triggered manually for daily, monthly or weekly tasks. Refer to `sudo ./mpserver-maintenance.sh --help`.
 
+```
+Usage: ./mpserver-maintenance.sh [<options>] [<command>]
+
+Options:
+	--dry-run	Don't execute anything, only show what would be executed
+	--no-email	Don't send an email with the log
+	--help		Show this help message and exit.
+
+Commands:
+	daily		Run daily maintenance tasks
+	weekly		Run weekly maintenance tasks
+	monthly	Run monthly maintenance tasks
+	docker <cmd>	Run docker-compose <cmd> on all services
+
+	If no command is passed, the script will determine the correct schedule and run the appropriate tasks.
+```
+
 The tasks are defined in the bash functions `weekly`, `monthly`, `daily`. Each trigger writes a detailed log into `~/maintenance/logs` which also gets emailed for `monthly` and `weekly` triggers.
+
 
 **Daily tasks**:
 1. Snapshot the subvolume "Daten" through btrbk
