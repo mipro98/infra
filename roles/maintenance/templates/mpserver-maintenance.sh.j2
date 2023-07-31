@@ -172,6 +172,24 @@ restart_containers()
     show_running_containers
 }
 
+# Credits @zilexa: https://github.com/zilexa/Homeserver/blob/eda45b052a619003f92584eec1c1059eca2f31d7/docker/HOST/monthly.sh#L48C1-L64C73
+update_containers()
+{
+    # Save old image creation date
+    docker images --format {% raw %}"table {{.Repository}}\t{{.CreatedAt}}"{% endraw %} > /tmp/img1.txt
+    # Get latest images
+    docker_compose_all_services pull
+    # Save image creation date
+    docker images --format {% raw %}"table {{.Repository}}\t{{.CreatedAt}}"{% endraw %} > /tmp/img2.txt
+    # Now create nice list of updated images
+    comm -13 <(sort /tmp/img1.txt) <(sort /tmp/img2.txt) > /tmp/img3.txt
+    log "\nUPDATED the following docker images: \n"
+    log $(cut -d ' ' -f 1 < /tmp/img3.txt > /tmp/result.txt)
+    rm /tmp/img*.txt /tmp/result.txt
+    # Now recreate containers with new images, remove orphans
+    docker_compose_all_services up -d --remove-orphans
+    log "\nDocker updates finished. \n"
+}
 
 docker_compose_all_services()
 {
@@ -251,6 +269,12 @@ daily()
         EMAIL=true      # always notify for error!
         LOG_TYPE="ERROR"
     fi
+
+    if isMounted "$MOUNT_BKP_DRIVE"; then
+        log "unmount Backup drive because it is still mounted..."
+        sync
+        umount $MOUNT_BKP_DRIVE
+    fi
 }
 
 weekly()
@@ -268,6 +292,8 @@ weekly()
 
     if isMounted "$MOUNT_BKP_DRIVE"; then
         run_backup
+        log "\n\nFree space on backup drive:"
+        log "$(btrfs filesystem usage $MOUNT_BKP_DRIVE | grep "Free (estimated)")"
         # unmount backup drive
         sync
         umount $MOUNT_BKP_DRIVE
@@ -279,6 +305,9 @@ weekly()
     fi
 
     update_system
+
+    log "\n\nFree space on NAS drive:"
+    log "$(btrfs filesystem usage $MOUNT_NAS | grep "Free (estimated)")"
 }
 
 monthly()
@@ -292,14 +321,14 @@ monthly()
     backup_dockerdata
     snapshot_all
 
-    # update all containers
-    docker_compose_all_services pull
-    docker_compose_all_services up -d
+    update_containers
     show_running_containers
     docker_prune
 
     if isMounted "$MOUNT_BKP_DRIVE"; then
         run_backup
+        log "\n\nFree space on backup drive:"
+        log "$(btrfs filesystem usage $MOUNT_BKP_DRIVE | grep "Free (estimated)")"
     else
         log "\n\n###################################################################"
         log "ERROR!! ~~~~~~ BACKUP DRIVE NOT MOUNTED! ~~~~~~ SKIPPING BACKUP AND SCRUBBING!"
@@ -317,6 +346,9 @@ monthly()
     fi
 
     update_system
+
+    log "\n\nFree space on NAS drive:"
+    log "$(btrfs filesystem usage $MOUNT_NAS | grep "Free (estimated)")"
 }
 
 
@@ -448,6 +480,12 @@ case $1 in
         EMAIL=false
         log "Deactivating email notifications for docker command."
         docker_compose_all_services "$@"
+        ;;
+    test)
+        DRYRUN=true
+        EMAIL=false
+        echo "Test mode, no email + dryrun"
+        update_containers
         ;;
     *)
         usage
