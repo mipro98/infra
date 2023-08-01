@@ -50,3 +50,10 @@
 - name: include nextcloud setup tasks
   include_tasks: nextcloud.yml
   when: '"nextcloud" in docker_services'
+
+- name: Ensure the ulogger-server repo is cloned in case ulogger is configured.
+  ansible.builtin.git:
+    repo: 'https://github.com/bfabiszewski/ulogger-server'
+    dest: "{{ docker_compose_dir }}/ulogger/ulogger-server"
+    update: false
+  when: '"ulogger" in docker_services'

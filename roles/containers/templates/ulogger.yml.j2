@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+
+  ulogger:
+    container_name: ulogger
+    hostname: ulogger
+    restart: always
+    build:
+      context: ./ulogger-server
+      args:
+        DB_DRIVER: sqlite
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ulogger.rule=Host(`{{ ulogger_domain }}`)"
+      - "traefik.http.routers.ulogger.entrypoints=websecure"
+      - "traefik.http.routers.ulogger.tls=true"
+      - "traefik.http.routers.ulogger.tls.certresolver=letsencrypt"
+    volumes:
+      - "{{ docker_data_dir }}/ulogger:/data"
+    networks:
+      - traefik-net
+
+networks:
+  traefik-net:
+      external: true

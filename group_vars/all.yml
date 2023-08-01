@@ -101,6 +101,7 @@ docker_services:
   - prometheus_grafana
   - node_exporter
   # - jellyfin
+  - ulogger
 
 
 # Nextcloud vars

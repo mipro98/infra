@@ -58,3 +58,6 @@ grafana_domain: grafana.mydomain.com
 
 # Jellyfin
 jellyfin_domain: jellyfin.mydomain.com
+
+# ulogger
+ulogger_domain: ulogger.mydomain.com
