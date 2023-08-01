@@ -31,6 +31,7 @@ Various configuration can be done using variables defined in `group_vars` or in 
 * Gitea
 * Homer
 * Vaultwarden
+* ulogger
 * Traefik v2 as the central reverse proxy.
 
 **_All these services are setup to be exposed through Traefik on different domains by simply providing domain names for the services in `vault.yml`._**
@@ -178,9 +179,12 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 
 ---
 
-## Tips
+## Notes & Tips
 
 
+* **for [ulogger](/roles/containers/templates/ulogger.yml.j2)**:
+  * The container is setup to use sqlite
+  * Before the first run: Either use a _named_ volume[^1] or start the container once with a bind mount other than `/data` to copy the container contents of `/data` onto the host to bootstrap the database.
 * The `makefile` supports shorthands for often used Ansible commands. For example, when only modifying `mpserver-maintenance.sh`, just run `make script` and it will only replace the script on the server.
 * Under **`~/docker/compose.sh`**, there exists a **convenience script for docker-compose** where you can execute actions on **all** containers at once. For example:
     ```bash
@@ -191,6 +195,7 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 * Make sure to also re-deploy the maintenance script when adding/removing docker services in `group_vars` since the script will change according to the enabled services.
 * Enable `debug_ports_open: true` to open ports on the host bypassing the reverse proxy. This can be used for debugging, e.g. Traefik metrics and node_exporter is usually not accessible outside of `traefik-net`.
 
+[^1]:https://stackoverflow.com/q/65176940
 
 ---
 
