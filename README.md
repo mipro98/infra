@@ -5,7 +5,7 @@
 
 <h4 align=center>Flexible docker-compose templates for various services like Nextcloud, Vaultwarden, Gitea, Prometheus+Grafana,...</h4>
 <h4 align=center>All services are set up ready-to-use with a Traefik reverse proxy and automatic TLS certificates.</h4>
-<h4 align=center>Automatic server maintenance with auto updates, S.M.A.R.T monitoring, BTRFS snapshots and email notifications.</h4>
+<h4 align=center>Unattended server maintenance with auto updates, S.M.A.R.T monitoring, BTRFS snapshots and email notifications.</h4>
 
 ---
 
