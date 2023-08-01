@@ -83,6 +83,7 @@ fail2ban_maxretry: 5
 # Docker vars
 docker_compose_dir: "/home/{{ username }}/docker"
 docker_data_dir: "/home/{{ username }}/dockerdata"
+docker_data_backup_dir: "{{ mount_nas_drive }}/Backups/Michi/00_dockerdata"
 
 # expose some ports natively on the host for debugging instead of only routing through reverse proxy
 # -> BE VERY CAREFUL when adding additional jinja if templates in docker-compose.yml files because whitespace is messed up!
