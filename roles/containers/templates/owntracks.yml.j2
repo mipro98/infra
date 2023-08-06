@@ -1,0 +1,63 @@
+version: '3'
+
+services:
+
+  owntracks-recorder:
+    image: owntracks/recorder
+    container_name: owntracks-recorder
+    hostname: otrecorder
+    restart: always
+
+    environment:
+      - OTR_PORT=0  # disables MQTT
+
+    volumes:
+      - "{{ docker_data_dir }}/owntracks/recorder_config:/config"
+      - "{{ docker_data_dir }}/owntracks/recorder_store:/store"
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.otrecorder.tls=true"
+      - "traefik.http.routers.otrecorder.rule=Host(`{{ owntracks_recorder_domain }}`)"
+      - "traefik.http.routers.otrecorder.entrypoints=websecure"
+      - "traefik.http.routers.otrecorder.tls.certresolver=letsencrypt"
+      - "traefik.http.services.otrecorder.loadbalancer.server.port=8083"
+      # basic auth:
+      - "traefik.http.middlewares.owntracks-auth.basicauth.users={{ owntracks_basic_auth }}"
+      - "traefik.http.routers.otrecorder.middlewares=owntracks-auth@docker"
+
+    networks:
+      - traefik-net
+
+
+  owntracks-frontend:
+    image: owntracks/frontend
+    container_name: owntracks-frontend
+    restart: always
+    depends_on:
+      - owntracks-recorder
+
+    volumes:
+      - "{{ docker_data_dir }}/owntracks/config.js:/usr/share/nginx/html/config/config.js"
+
+    environment:
+      - SERVER_HOST=otrecorder
+      - SERVER_PORT=8083
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.otfrontend.tls=true"
+      - "traefik.http.routers.otfrontend.rule=Host(`{{ owntracks_frontend_domain }}`)"
+      - "traefik.http.routers.otfrontend.entrypoints=websecure"
+      - "traefik.http.routers.otfrontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.otfrontend.loadbalancer.server.port=80"
+      # basic auth:
+      - "traefik.http.routers.otfrontend.middlewares=owntracks-auth@docker"
+
+    networks:
+      - traefik-net
+
+
+networks:
+    traefik-net:
+        external: true

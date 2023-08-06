@@ -32,8 +32,8 @@ gitea_ssh_port: 6969
 
 # Homer
 homer_domain: homer.mydomain.com
-homer_lan_port: 4242    # lan-internal port bypassing reverse proxy (without basic auth!)
-homer_login: Username:HashedPW
+homer_lan_port: 4242                # lan-internal port bypassing reverse proxy (without basic auth!)
+homer_login: Username:HashedPW      # generate with "echo $(htpasswd -nb Username password) | sed -e s/\\$/\\$\\$/g"
 
 # Nextcloud
 nextcloud_domain: nextcloud.mydomain.com
@@ -61,3 +61,8 @@ jellyfin_domain: jellyfin.mydomain.com
 
 # ulogger
 ulogger_domain: ulogger.mydomain.com
+
+# owntracks
+owntracks_frontend_domain: owntracks.mydomain.com
+owntracks_recorder_domain: otrecorder.mydomain.com
+owntracks_basic_auth: Username:HashedPW
