@@ -54,3 +54,7 @@ services:
       - "{{ docker_data_dir }}/traefik/acme.json:/acme.json"
       - "{{ docker_data_dir }}/traefik/logs:/var/log"
     restart: always
+
+networks:
+  default:
+    name: traefik-net
