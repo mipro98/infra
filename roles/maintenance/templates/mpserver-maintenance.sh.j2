@@ -61,7 +61,6 @@ usage()
     echo -e "\tdaily\t\tRun daily maintenance tasks"
     echo -e "\tweekly\t\tRun weekly maintenance tasks"
     echo -e "\tmonthly\t\tRun monthly maintenance tasks"
-    echo -e "\tdocker <cmd>\tRun docker-compose <cmd> on all services"
     echo -e "\n\tIf no command is passed, the script will determine the correct schedule and run the appropriate tasks."
 }
 
@@ -469,15 +468,6 @@ case $1 in
         ;;
     monthly)
         monthly
-        ;;
-    docker)
-        shift
-        if [[ $# -eq 0 ]]; then
-            quit_script "docker command needs a parameter!"
-        fi
-        EMAIL=false
-        log "Deactivating email notifications for docker command."
-        docker_compose_all_services "$@"
         ;;
     test)
         DRYRUN=true

@@ -123,7 +123,6 @@ Commands:
 	daily		Run daily maintenance tasks
 	weekly		Run weekly maintenance tasks
 	monthly	Run monthly maintenance tasks
-	docker <cmd>	Run docker-compose <cmd> on all services
 
 	If no command is passed, the script will determine the correct schedule and run the appropriate tasks.
 ```
