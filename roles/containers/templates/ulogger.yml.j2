@@ -10,6 +10,7 @@ services:
       context: ./ulogger-server
       args:
         DB_DRIVER: sqlite
+    image: "{{ username }}/ulogger-custom"
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.ulogger.rule=Host(`{{ ulogger_domain }}`)"
