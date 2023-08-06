@@ -20,7 +20,3 @@ services:
       - "{{ docker_data_dir }}/ulogger:/data"
     networks:
       - traefik-net
-
-networks:
-  traefik-net:
-      external: true

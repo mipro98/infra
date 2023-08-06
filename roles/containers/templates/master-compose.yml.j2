@@ -1,0 +1,7 @@
+version: '3.8'
+
+include:
+{% for service in docker_services %}
+  - path: ./{{ service }}/compose-{{ service }}.yml
+{% endfor %}
+  - path: ./commons.yml

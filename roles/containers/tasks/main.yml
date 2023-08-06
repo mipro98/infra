@@ -29,20 +29,36 @@
     cmd: id -g
   register: unixgroup_id
 
-- name: Copy docker-compose.yml files for the enabled services in the respective folders
+- name: Copy compose-SERVICE.yml (docker-compose) files for the enabled services in the respective folders.
   ansible.builtin.template:
     src: "{{ item }}.yml.j2"
+    dest: "{{ docker_compose_dir }}/{{ item }}/compose-{{ item }}.yml"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: '644'
+  with_items: "{{ docker_services }}"
+
+- name: Generate service-level docker-compose.yml files.
+  ansible.builtin.template:
+    src: service-compose.yml.j2
     dest: "{{ docker_compose_dir }}/{{ item }}/docker-compose.yml"
     owner: "{{ username }}"
     group: "{{ unixgroup }}"
     mode: '644'
   with_items: "{{ docker_services }}"
 
-# ATTENTION!! needs to be replaced: "Using a variable in the content field will result in unpredictable output."
-- name: Copy convenience script for starting all containers (MAY BE BROKEN!!)
+- name: Copy commons.yml into {{ docker_compose_dir }}.
   ansible.builtin.copy:
-    content: "#!/bin/bash\nsudo bash /home/{{ username }}/maintenance/mpserver-maintenance.sh docker \"$@\""
-    dest: "{{ docker_compose_dir }}/compose.sh"
+    src: commons.yml
+    dest: "{{ docker_compose_dir }}/commons.yml"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: '744'
+
+- name: Generate master docker-compose for administering all containers at once.
+  ansible.builtin.template:
+    src: "master-compose.yml.j2"
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
     owner: "{{ username }}"
     group: "{{ unixgroup }}"
     mode: '744'

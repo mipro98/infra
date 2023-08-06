@@ -23,7 +23,3 @@ services:
       - "traefik.http.routers.filebrowser.tls.certresolver=letsencrypt"
     networks:
       - traefik-net
-
-networks:
-    traefik-net:
-        external: true

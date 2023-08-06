@@ -19,7 +19,3 @@ services:
       - "traefik.http.routers.dokuwiki.tls.certresolver=letsencrypt"
     networks:
       - traefik-net
-
-networks:
-    traefik-net:
-        external: true
