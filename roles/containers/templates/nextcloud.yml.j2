@@ -39,10 +39,11 @@ services:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER={{ nextcloud_db_user }}
       - MYSQL_HOST=nextcloud-db
-      - PHP_MEMORY_LIMIT=4G
+      - PHP_MEMORY_LIMIT=6G
+      - PHP_UPLOAD_LIMIT=6G
 
     tmpfs:
-      - /tmp:exec
+      - /tmp:exec,size=6G
 
     volumes:
       - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:z"
@@ -104,7 +105,7 @@ services:
     devices:
       - /dev/dri:/dev/dri
     tmpfs:
-      - /tmp
+      - /tmp:exec,size=6G
     volumes:
       - "{{ docker_data_dir }}/nextcloud/data:/var/www/html:ro"
       - "{{ mount_nas_drive }}/Daten/Nextcloud:/var/www/html/data:ro"
