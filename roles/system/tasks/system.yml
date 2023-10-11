@@ -69,7 +69,7 @@
 
 - name: Place .tmux.conf
   ansible.builtin.copy:
-    content: "set -g mouse on\n"
+    src: tmux.conf
     dest: "/home/{{ username }}/.tmux.conf"
     mode: '644'
     owner: "{{ username }}"
