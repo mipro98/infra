@@ -195,6 +195,22 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 
 ---
 
+## TODOs
+
+- [ ] Maintenance: Run all scrubbing tasks in parallel.
+- [ ] btrbk: change retention policy to keep Sunday's backups instead of Monday's.
+- [ ] Maintenance: Send Email when scrubbing starts, send another one when scrubbing has ended containing possible errors.
+- [ ] Maintenance: Better log for transferred files during snapshots & backups with btrbk and rsync.
+- [ ] Maintenance: Email formatting with `code` so that `>>` doesn't get interpreted as quote by some Email clients.
+- [ ] Add overall downtime monitoring with alert when server comes back online (and possibly when it is down and monitoring is done from another host).
+- [ ] Improve Grafana dashboards.
+- [ ] Maintenance: Auto Reboot when Kernel has updated.
+- [ ] Add alertion system for suspicious events like access from a specific country or a DDOS attempt.
+- [ ] Maintenance: Better system update / pacman / paru logging (do not log whole stdout).
+
+
+---
+
 ## Credits
 
 A large portion of the repository is inspired by [Alex Kretzschmar's infra repo](https://github.com/ironicbadger/infra) as well as [Wolfgang notthebee's infra repo](https://github.com/notthebee/infra). Also, both BTRFS maintenance and the system setup was largely inspired by [zilexa's Homeserver Guide](https://github.com/zilexa/Homeserver).
