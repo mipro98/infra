@@ -184,6 +184,7 @@ update_containers()
     comm -13 <(sort /tmp/img1.txt) <(sort /tmp/img2.txt) > /tmp/img3.txt
     log "\nUPDATED the following docker images: \n"
     log $(cut -d ' ' -f 1 < /tmp/img3.txt > /tmp/result.txt)
+    log "$(cat /tmp/result.txt)"
     rm /tmp/img*.txt /tmp/result.txt
     # Now recreate containers with new images, remove orphans
     docker_compose_all_services up -d --remove-orphans
