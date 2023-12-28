@@ -97,11 +97,14 @@ services:
 
   # https://github.com/pulsejet/go-vod
   go-vod:
-    build: ./go-vod
-    image: "{{ username }}/go-vod-custom"
+    image: radialapps/go-vod
     hostname: go-vod
     container_name: go-vod
     restart: always
+    depends_on:
+      - nextcloud
+    environment:
+      - NEXTCLOUD_HOST=https://{{ nextcloud_domain }}
     devices:
       - /dev/dri:/dev/dri
     tmpfs:

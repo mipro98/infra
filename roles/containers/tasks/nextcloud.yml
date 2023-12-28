@@ -1,11 +1,5 @@
 ---
 
-- name: Ensure the repo go-vod exists in case nextcloud is configured.
-  ansible.builtin.git:
-    repo: 'https://github.com/pulsejet/go-vod'
-    dest: "{{ docker_compose_dir }}/nextcloud/go-vod"
-    update: false
-
 - name: Setup custom Dockerfile for nextcloud to have ffmpeg in Nextcloud container.
   ansible.builtin.template:
     src: "Dockerfile-nextcloud.j2"

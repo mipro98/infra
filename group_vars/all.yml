@@ -107,7 +107,7 @@ docker_services:
 
 
 # Nextcloud vars
-nextcloud_version: 27-apache
+nextcloud_version: 28-apache
 
 
 # Maintenance vars
