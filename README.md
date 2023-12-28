@@ -165,7 +165,6 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 **Notes:**
 
 * The nextcloud container will _not_ auto-update unless you run `docker-compose build --pull nextcloud` inside `~/docker/nextcloud` because the container is built using `~/docker/nextcloud/Dockerfile` in order to have ffmpeg support. Since Nextcloud updates often require manual intervention and can easily be discovered through the admin panel, this isn't that much of an issue.
-* The [go-vod](https://github.com/pulsejet/go-vod) container needs to be built from the (locally cloned) github repository. Ansible takes care of cloning the go-vod repository from github in the right place when executing the `containers` role.
 * I use [Nextcloud Memories](https://memories.gallery/) alongside [Preview Generator](https://apps.nextcloud.com/apps/previewgenerator) and [Recognize](https://apps.nextcloud.com/apps/recognize) without issues and with hardware transcoding using the seperate go-vod instance. To make it work, adjust the following in the _Memories_ Admin GUI:
   * enable "Images", "HEIC" and "Videos" under "File Support"
   * define `/usr/bin/ffmpeg` / `/usr/bin/ffprobe` as ffmpeg / ffprobe path
