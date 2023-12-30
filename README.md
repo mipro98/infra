@@ -97,6 +97,8 @@ _Note:_ SSH configuration is skipped for now.
 At the heart of the maintenance role is the script `mpserver-maintenance.sh` which gets deployed by ansible. Additionally:
 * A systemd timer is set up which triggers above script every night at 2 A.M.
 * The `btrbk.conf` file is deployed
+* An `uptime-monitor.sh` script is deployed which checks continously whether the server is online. When it is offline, it optionally executes an ssh command  (I use it to restart my router). After successful reconnect, an E-Mail is sent about the downtime.
+* A systemd service is installed to start the `uptime-monitor.sh` script on boot.
 
 Refer to section [Automatic Maintenance](#automatic-maintenance) for more details.
 
@@ -201,7 +203,7 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 - [ ] Maintenance: Send Email when scrubbing starts, send another one when scrubbing has ended containing possible errors.
 - [ ] Maintenance: Better log for transferred files during snapshots & backups with btrbk and rsync.
 - [ ] Maintenance: Email formatting with `code` so that `>>` doesn't get interpreted as quote by some Email clients.
-- [ ] Add overall downtime monitoring with alert when server comes back online (and possibly when it is down and monitoring is done from another host).
+- [x] Add overall downtime monitoring with alert when server comes back online (and possibly when it is down and monitoring is done from another host).
 - [ ] Improve Grafana dashboards.
 - [ ] Maintenance: Auto Reboot when Kernel has updated.
 - [ ] Add alertion system for suspicious events like access from a specific country or a DDOS attempt.
