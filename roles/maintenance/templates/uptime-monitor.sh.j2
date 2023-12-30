@@ -1,0 +1,91 @@
+#!/bin/bash
+
+FRITZBOX_IP="{{ ip_online_check }}"
+OPENWRT_IP="{{ ip_openwrt_router }}"
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+LOGFILE="${SCRIPT_DIR}/offline.txt"
+SEPERATOR="---------"
+
+
+function log
+{
+    echo -e "$@" &>> "$LOGFILE"
+}
+
+function restart_router
+{
+    if ! is_reachable "$OPENWRT_IP"
+    then
+        log "OPENWRT Router ($OPENWRT_IP) is not reachable!"
+        return 1
+    fi
+
+    restart_attempts="$(get_new_messages | grep -c "restarting router")"
+    if [ "$restart_attempts" -ge 3 ]
+    then
+        log "Restarting router failed 3 times in a row. Giving up."
+        return 1
+    fi
+
+    log "restarting router..."
+    if ssh openwrt "reboot"
+    then
+        sleep 20     # sleep extra 20s to let router restart and set up DHCP properly
+    else
+        log "restarting per SSH failed!"
+    fi
+}
+
+
+function is_reachable
+{
+    ping -W 1 -c 1 "$1" &> /dev/null
+}
+
+function timestamp
+{
+    date "+%Y %b %d %H:%M:%S"
+}
+
+function get_new_messages
+{
+    # get the newest messages after the last SEPERATOR https://unix.stackexchange.com/a/140314
+    tac "$LOGFILE" | sed -e "/$SEPERATOR/q" | tac | tail -n+2
+}
+
+function send_email
+{
+    new_messages=$(get_new_messages)
+    log "Sending Email..."
+    echo "$new_messages" | mutt -s "SERVER was offline!" {{ email_alerts_receiver }} &> /dev/null
+}
+
+function check_first_time_online
+{
+    # check if new messages are there (= not $SEPERATOR in last line)
+    last_log_msg=$( tail -n 1 "$LOGFILE" )
+    if [[ ! $last_log_msg == *$SEPERATOR* ]]; then
+        log "$(timestamp): went online again."
+        send_email
+        log $SEPERATOR
+    else
+        echo -n "."
+    fi
+}
+
+######################################################################
+
+echo "Listening for changes in network connectivity..."
+
+while true
+do
+    if is_reachable "$FRITZBOX_IP"
+    then
+        check_first_time_online
+    else
+        log "$(timestamp): offline."
+        restart_router
+    fi
+    sleep 30
+done

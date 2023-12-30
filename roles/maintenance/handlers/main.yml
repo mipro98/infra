@@ -1,0 +1,8 @@
+---
+
+- name: Restart uptime monitoring systemd service.
+  become: true
+  ansible.builtin.systemd:
+    name: uptime-monitor
+    state: "restarted"
+    enabled: true

@@ -17,6 +17,16 @@
     mode: '744'
   tags: script
 
+- name: Copy uptime monitoring script. WARNING MAKE SURE SSH ACCESS IS SETUP IN OPENWRT!!!!!
+  ansible.builtin.template:
+    src: "uptime-monitor.sh.j2"
+    dest: "/home/{{ username }}/maintenance/uptime-monitor.sh"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: '744'
+  tags: script
+  notify: Restart uptime monitoring systemd service.
+
 - name: Copy btrbk configuration.
   ansible.builtin.template:
     src: "btrbk.conf.j2"
@@ -54,5 +64,22 @@
   become: true
   ansible.builtin.systemd:
     name: mpserver-maintenance.timer
+    state: "started"
+    enabled: true
+
+- name: Copy systemd service for uptime monitoring script.
+  become: true
+  ansible.builtin.template:
+    src: "uptime-monitor.service.j2"
+    dest: "/etc/systemd/system/uptime-monitor.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart uptime monitoring systemd service.
+
+- name: Enable and start systemd service for uptime monitoring script.
+  become: true
+  ansible.builtin.systemd:
+    name: uptime-monitor
     state: "started"
     enabled: true
