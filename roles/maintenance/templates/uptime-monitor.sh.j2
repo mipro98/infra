@@ -40,7 +40,7 @@ function restart_router
 
 function is_reachable
 {
-    ping -W 1 -c 1 "$1" &> /dev/null
+    ping -W 3 -c 1 "$1" &> /dev/null
 }
 
 function timestamp
