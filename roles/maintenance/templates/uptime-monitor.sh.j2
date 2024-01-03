@@ -71,6 +71,13 @@ function get_new_messages
 
 function send_email
 {
+    offline_events="$(get_new_messages | grep -c "offline")"
+    if [ "$offline_events" -eq 1 ]
+    then
+        # first time offline, don't send email yet
+        return 0
+    fi
+
     new_messages=$(get_new_messages)
     log "Sending Email..."
     echo "$new_messages" | mutt -s "SERVER was offline!" {{ email_alerts_receiver }} &> /dev/null
