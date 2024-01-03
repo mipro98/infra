@@ -29,7 +29,9 @@ LOG_TYPE="ERROR"
 
 # Get this script folder path
 SCRIPTDIR="$(dirname "$(readlink -f "$BASH_SOURCE")")"
+
 LOGFILE="${SCRIPTDIR}/logs/$(date +%Y%m%d_%H%M%S).log"
+SYSUPDATE_LOG="${SCRIPTDIR}/logs/$(date +%Y%m%d_%H%M%S)_systemupdate.log"
 LOCKFILE=/tmp/running-maintenance.lock
 
 MOUNT_BKP_DRIVE="{{ mount_backup_drive }}"
@@ -73,7 +75,18 @@ log()
 send_email_with_logs()
 {
     if $EMAIL; then
-        mutt -s "$LOG_TYPE Server Maintenance Log $(date +%F)" {{ email_alerts_receiver }} < $LOGFILE &> /dev/null
+        EMAIL_FILE="/tmp/email.txt"
+        echo "<pre><code>" > $EMAIL_FILE
+        cat "$LOGFILE" >> $EMAIL_FILE
+        echo "</code></pre>" >> $EMAIL_FILE
+        SUBJECT="$1$LOG_TYPE Server Maintenance Log $(date +%F)"
+
+        if [ -f "$SYSUPDATE_LOG" ]; then
+            mutt -e "set content_type=text/html" -s "$SUBJECT" {{ email_alerts_receiver }} -a "$SYSUPDATE_LOG" < $EMAIL_FILE &> /dev/null
+        else
+            mutt -e "set content_type=text/html" -s "$SUBJECT" {{ email_alerts_receiver }} < $EMAIL_FILE &> /dev/null
+        fi
+        rm $EMAIL_FILE
     fi
 }
 
@@ -133,7 +146,7 @@ update_system()
         log "\n\nupdates available:"
         log "$(checkupdates)\n"
         if ! $DRYRUN; then
-            pacman -Syu --noconfirm &>> $LOGFILE
+            pacman -Syu --noconfirm &>> "$SYSUPDATE_LOG"
         fi
     else
         log "\n\nNo system updates available."
@@ -182,9 +195,9 @@ update_containers()
     docker images --format {% raw %}"table {{.Repository}}\t{{.CreatedAt}}"{% endraw %} > /tmp/img2.txt
     # Now create nice list of updated images
     comm -13 <(sort /tmp/img1.txt) <(sort /tmp/img2.txt) > /tmp/img3.txt
-    log "\nUPDATED the following docker images: \n"
+    log "\nUPDATED the following docker images:"
     log "$(cut -d ' ' -f 1 < /tmp/img3.txt > /tmp/result.txt)"
-    log "$(cat /tmp/result.txt)"
+    log "$(sed -e 's/^/\t/' /tmp/result.txt)"   # indent with sed
     rm /tmp/img*.txt /tmp/result.txt
     # Now recreate containers with new images, remove orphans
     docker_compose_all_services up -d --remove-orphans
@@ -243,7 +256,8 @@ scrub() {
     if ! $DRYRUN; then
         btrfs scrub start -Bd -c 2 -n 4 $1 &>> $LOGFILE
     fi
-    btrfs dev stats "$1" &>> $LOGFILE
+    btrfs scrub status "$1" &>> "$LOGFILE"
+    btrfs dev stats "$1" &>> "$LOGFILE"
 }
 
 # ----------------------------------------------------- Scripts ----------------------------------------------------------
@@ -332,15 +346,18 @@ monthly()
         log "ERROR!! ~~~~~~ BACKUP DRIVE NOT MOUNTED! ~~~~~~ SKIPPING BACKUP AND SCRUBBING!"
         log "###################################################################\n\n"
         LOG_TYPE="ERROR"
-   fi
+    fi
 
-    scrub $MOUNT_NAS
+    # send preliminary email before scrubbing
+    send_email_with_logs "(PRELIM) "
+
+    scrub "$MOUNT_NAS"
 
     if isMounted "$MOUNT_BKP_DRIVE"; then
-        scrub $MOUNT_BKP_DRIVE
+        scrub "$MOUNT_BKP_DRIVE"
         # unmount backup drive
         sync
-        umount $MOUNT_BKP_DRIVE
+        umount "$MOUNT_BKP_DRIVE"
     fi
 
     update_system
