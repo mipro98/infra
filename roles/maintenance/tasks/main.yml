@@ -15,7 +15,7 @@
     owner: "{{ username }}"
     group: "{{ unixgroup }}"
     mode: '744'
-  tags: script
+  tags: script_edit
 
 - name: Copy uptime monitoring script. WARNING MAKE SURE SSH ACCESS IS SETUP IN OPENWRT!!!!!
   ansible.builtin.template:
@@ -24,7 +24,7 @@
     owner: "{{ username }}"
     group: "{{ unixgroup }}"
     mode: '744'
-  tags: script
+  tags: script_edit
   notify: Restart uptime monitoring systemd service.
 
 - name: Copy btrbk configuration.

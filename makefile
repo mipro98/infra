@@ -10,8 +10,8 @@ system:
 maintenance:
 	ansible-playbook run.yml -t maintenance
 
-script:
-	ansible-playbook run.yml -t script
+script:  # when a bash script was edited (uptime-monitor.sh or mpserver-maintenance.sh)
+	ansible-playbook run.yml -t script_edit
 
 # -----------------
 

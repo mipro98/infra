@@ -60,8 +60,6 @@
     path: "{{ docker_compose_dir }}/traefik/docker-compose.yml"
     regexp: '.*path: .*commons.yml'
     state: "absent"
-  tags:
-    - traefik
 
 - name: Generate master docker-compose for administering all containers at once.
   ansible.builtin.template:
