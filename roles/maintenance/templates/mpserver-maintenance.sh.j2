@@ -300,7 +300,6 @@ scrub() {
     if ! $DRYRUN; then
         btrfs scrub start -Bd -c 2 -n 4 $1 &>> $LOGFILE
     fi
-    btrfs scrub status "$1" &>> "$LOGFILE"
     btrfs dev stats "$1" &>> "$LOGFILE"
 }
 
