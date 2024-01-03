@@ -13,7 +13,8 @@ function log
     echo -e "$@" &>> "$LOGFILE"
 }
 
-function restart_router
+
+function handle_restart_router
 {
     if ! is_reachable "$OPENWRT_IP"
     then
@@ -28,6 +29,20 @@ function restart_router
         return 1
     fi
 
+    offline_events="$(get_new_messages | grep -c "offline")"
+    if [ "$offline_events" -eq 1 ]
+    then
+        # first time offline, don't restart router yet
+        return 0
+    fi
+
+    restart_router
+}
+
+
+
+function restart_router
+{
     log "restarting router..."
     if ssh openwrt "reboot"
     then
@@ -40,7 +55,7 @@ function restart_router
 
 function is_reachable
 {
-    ping -W 1 -c 1 "$1" &> /dev/null
+    ping -W 3 -c 1 "$1" &> /dev/null
 }
 
 function timestamp
@@ -85,7 +100,7 @@ do
         check_first_time_online
     else
         log "$(timestamp): offline."
-        restart_router
+        handle_restart_router
     fi
     sleep 30
 done
