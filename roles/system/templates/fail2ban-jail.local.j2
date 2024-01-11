@@ -15,3 +15,9 @@ enabled = true
 port    = {{ security_ssh_port }}
 logpath = %(sshd_log)s
 backend = %(sshd_backend)s
+
+[traefik-auth]
+enabled = true
+logpath = {{ docker_data_dir }}/traefik/logs/traefik-access.log
+mode = ddos
+port = http,https
