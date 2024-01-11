@@ -1,5 +1,7 @@
 version: '3.8'
 
+name: "my_homeserver_stack"
+
 include:
 {% for service in docker_services %}
   - path: ./{{ service }}/compose-{{ service }}.yml

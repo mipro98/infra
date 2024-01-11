@@ -208,7 +208,7 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 - [ ] Maintenance: Auto Reboot when Kernel has updated.
 - [ ] Add alertion system for suspicious events like access from a specific country or a DDOS attempt.
 - [x] Maintenance: Better system update / pacman / paru logging (do not log whole stdout).
-- [ ] Docker-Compose: making local compose invocations work exchangeably with master-compose invocations (since `com.docker.compose.project` and `com.docker.compose.project.working_dir` Label don't match)
+- [x] Docker-Compose: making local compose invocations work exchangeably with master-compose invocations (since `com.docker.compose.project` and `com.docker.compose.project.working_dir` Label don't match) (fixed using )
 
 
 ---
