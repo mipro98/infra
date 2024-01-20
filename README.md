@@ -199,7 +199,6 @@ The Nextcloud stack is carefully fine-tuned for performance and simplicity using
 ## TODOs
 
 - [ ] Maintenance: Run all scrubbing tasks in parallel.
-- [ ] btrbk: change retention policy to keep Sunday's backups instead of Monday's.
 - [x] Maintenance: Send Email when scrubbing starts, send another one when scrubbing has ended containing possible errors.
 - [x] Maintenance: Better log for transferred files during snapshots & backups with btrbk and rsync.
 - [x] Maintenance: Email formatting with `code` so that `>>` doesn't get interpreted as quote by some Email clients.

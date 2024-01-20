@@ -247,13 +247,17 @@ snapshot_all()
         EMAIL=true      # always notify for error!
         LOG_TYPE="ERROR"
     fi
+}
 
-    show_deleted_files Daten
-    # show_deleted_files Backups
-    show_deleted_files Archiv
-    show_deleted_files Filme
-    show_deleted_files Musik
+show_deleted_files_nas()
+{
+    show_deleted_files "$MOUNT_NAS"/snapshots/"$1"
+}
 
+
+show_deleted_files_bkp()
+{
+    show_deleted_files "$MOUNT_BKP_DRIVE"/"$1"
 }
 
 show_deleted_files()
@@ -266,7 +270,7 @@ show_deleted_files()
         return 1
     fi
 
-    last_two_snapshots=$(find {{ mount_nas_drive }}/snapshots/"$1" -maxdepth 1 -name "${1}*" | tail -n 2)
+    last_two_snapshots=$(find "$1" -maxdepth 1 -path "${1}*" | tail -n 2)
     parent_snapshot=$(echo "$last_two_snapshots" | head -n 1)
     current_snapshot=$(echo "$last_two_snapshots" | tail -n 1)
 
@@ -331,7 +335,7 @@ daily()
         umount $MOUNT_BKP_DRIVE
     fi
 
-    show_deleted_files Daten
+    show_deleted_files_nas Daten
 }
 
 weekly()
@@ -349,6 +353,13 @@ weekly()
 
     if isMounted "$MOUNT_BKP_DRIVE"; then
         run_backup
+
+        show_deleted_files_bkp Daten
+        # show_deleted_files_bkp Backups
+        show_deleted_files_bkp Archiv
+        show_deleted_files_bkp Filme
+        show_deleted_files_bkp Musik
+
         log "\n\nFree space on backup drive:"
         log "$(btrfs filesystem usage $MOUNT_BKP_DRIVE | grep "Free (estimated)")"
         # unmount backup drive
@@ -536,10 +547,10 @@ case $1 in
         DRYRUN=true
         EMAIL=false
         echo "Test mode, no email + dryrun"
-        show_deleted_files Daten
-        show_deleted_files Archiv
-        show_deleted_files Filme
-        show_deleted_files Musik
+        show_deleted_files_bkp Daten
+        show_deleted_files_bkp Archiv
+        show_deleted_files_bkp Filme
+        show_deleted_files_bkp Musik
         ;;
     *)
         usage
