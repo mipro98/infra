@@ -102,6 +102,13 @@ echo "Listening for changes in network connectivity..."
 
 while true
 do
+    # between 4:29am and 4:32am, not checking for connectivity (because router restart)
+    if [[ "$(date +%H:%M)" > "04:29" ]] && [[ "$(date +%H:%M)" < "04:32" ]]
+    then
+        sleep 30
+        continue
+    fi
+
     if is_reachable "$FRITZBOX_IP"
     then
         check_first_time_online
