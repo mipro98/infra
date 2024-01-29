@@ -66,3 +66,11 @@ ulogger_domain: ulogger.mydomain.com
 owntracks_frontend_domain: owntracks.mydomain.com
 owntracks_recorder_domain: otrecorder.mydomain.com
 owntracks_basic_auth: Username:HashedPW
+
+
+# Planka
+planka_domain: planka.mydomain.com
+planka_secret_key: <secret_key>
+planka_admin_email: plankaadmin@mydomain.com
+planka_admin_username: admin
+

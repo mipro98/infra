@@ -27,13 +27,14 @@ Various configuration can be done using variables defined in `group_vars` or in 
 <u>**This repo contains ready-to-use container setups for:**</u>
 * Nextcloud ([with Mariadb, Redis, Cron, Collabora, Memories incl. hardware transcoding](#nextcloud-stack))
 * A server monitoring stack with [Prometheus](https://prometheus.io/), [Grafana](https://grafana.com/) and [node_exporter](https://github.com/prometheus/node_exporter).
-* Dokuwiki
-* Gitea
-* Homer
-* Vaultwarden
-* ulogger
-* OwnTracks
-* Traefik v2 as the central reverse proxy.
+* [Dokuwiki](https://www.dokuwiki.org/dokuwiki)
+* [Gitea](https://about.gitea.com/)
+* [Homer](https://github.com/bastienwirtz/homer)
+* [Vaultwarden](https://github.com/dani-garcia/vaultwarden)
+* [ulogger](https://github.com/bfabiszewski/ulogger-server)
+* [OwnTracks](https://owntracks.org/) ([recorder](https://github.com/owntracks/recorder) + [frontend](https://github.com/owntracks/frontend))
+* [Planka](https://planka.app/)
+* [Traefik v2](https://doc.traefik.io/traefik/) as the central reverse proxy.
 
 **_All these services are setup to be exposed through Traefik on different domains by simply providing domain names for the services in `vault.yml`._**
 

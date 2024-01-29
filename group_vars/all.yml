@@ -104,6 +104,7 @@ docker_services:
   # - jellyfin
   - ulogger
   - owntracks
+  - planka
 
 
 # Nextcloud vars
@@ -116,3 +117,6 @@ btrbk_config_dir: /etc/btrbk/btrbk.conf
 # for uptime monitoring
 ip_online_check: 192.168.178.1
 ip_openwrt_router: 192.168.1.1
+
+# Planka
+planka_base_url: "https://{{ planka_domain }}"

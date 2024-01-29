@@ -1,0 +1,68 @@
+version: '3'
+
+services:
+  planka:
+    image: ghcr.io/plankanban/planka:latest
+    container_name: planka
+    hostname: planka
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          ./start.sh &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 seconds...\";
+          sleep 5;
+        done; (exit $$s)"
+    restart: always
+    volumes:
+      - "{{ docker_data_dir }}/planka/user-avatars:/app/public/user-avatars"
+      - "{{ docker_data_dir }}/planka/project-background-images:/app/public/project-background-images"
+      - "{{ docker_data_dir }}/planka/attachments:/app/private/attachments"
+    environment:
+      - BASE_URL={{ planka_base_url }}
+      - DATABASE_URL=postgresql://postgres@planka-db/planka
+      - SECRET_KEY={{ planka_secret_key }}
+
+      # - TRUST_PROXY=0
+      # - TOKEN_EXPIRES_IN=365 # In days
+
+      # related: https://github.com/knex/knex/issues/2354
+      # As knex does not pass query parameters from the connection string we
+      # have to use environment variables in order to pass the desired values, e.g.
+      # - PGSSLMODE=<value>
+
+      # Configure knex to accept SSL certificates
+      # - KNEX_REJECT_UNAUTHORIZED_SSL_CERTIFICATE=false
+
+      - DEFAULT_ADMIN_EMAIL={{ planka_admin_email }} # Do not remove if you want to prevent this user from being edited/deleted
+      - DEFAULT_ADMIN_USERNAME={{ planka_admin_username }}
+
+      # enable the following on first run to initialize admin user
+      # - DEFAULT_ADMIN_PASSWORD=demo
+      # - DEFAULT_ADMIN_NAME=Demo Demo
+
+    depends_on:
+      - planka-db
+
+    networks:
+      - traefik-net
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.planka.rule=Host(`{{ planka_domain }}`)"
+      - "traefik.http.routers.planka.entrypoints=websecure"
+      - "traefik.http.routers.planka.tls=true"
+      - "traefik.http.routers.planka.tls.certresolver=letsencrypt"
+
+  planka-db:
+    image: postgres:14-alpine
+    container_name: planka-db
+    hostname: planka-db
+    restart: always
+    volumes:
+      - "{{ docker_data_dir }}/planka/db-data:/var/lib/postgresql/data"
+    environment:
+      - POSTGRES_DB=planka
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    networks:
+      - traefik-net
