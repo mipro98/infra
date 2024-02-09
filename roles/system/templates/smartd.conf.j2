@@ -13,5 +13,5 @@
 #                                   start a short self-test every day between 5-6am, and an extended self test weekly on Saturdays between 4-5am
 
 
-/dev/disk/by-uuid/{{ uuid_nas_drive }} -a -d sat -o on -S on -n standby,q -s (S/../.././05) -W 4,35,60 -m {{ email_alerts_receiver }}
-/dev/disk/by-uuid/{{ uuid_backup_drive }} -a -d sat -o on -S on -n standby,q -s (S/../.././05) -W 4,35,60 -m {{ email_alerts_receiver }}
+/dev/disk/by-uuid/{{ uuid_nas_drive }} -a -d sat -o on -S on -n standby,q -s (S/../.././05|L/../../6/04) -W 4,35,60 -m {{ email_alerts_receiver }}
+/dev/disk/by-uuid/{{ uuid_backup_drive }} -a -d sat -o on -S on -n standby,q -s (S/../.././05|L/../../6/04) -W 4,35,60 -m {{ email_alerts_receiver }}
