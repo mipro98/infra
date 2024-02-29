@@ -63,6 +63,7 @@ usage()
     echo -e "\tdaily\t\tRun daily maintenance tasks"
     echo -e "\tweekly\t\tRun weekly maintenance tasks"
     echo -e "\tmonthly\t\tRun monthly maintenance tasks"
+    echo -e "\tbackup-dockerdata\t\tBackup persistent docker volumes"
     echo -e "\n\tIf no command is passed, the script will determine the correct schedule and run the appropriate tasks."
 }
 
@@ -542,6 +543,10 @@ case $1 in
         ;;
     monthly)
         monthly
+        ;;
+    backup-dockerdata)
+        EMAIL=false
+        backup_dockerdata
         ;;
     test)
         DRYRUN=true
