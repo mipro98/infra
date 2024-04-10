@@ -102,7 +102,7 @@ docker_services:
   - prometheus_grafana
   - node_exporter
   # - jellyfin
-  - ulogger
+  # - ulogger
   - owntracks
   - planka
 
