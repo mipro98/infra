@@ -234,6 +234,14 @@ backup_dockerdata()
     sync # commit all changes to disk. (Maybe consider using btrfs filesystem sync OR btrfs subvolume sync instead?)
 }
 
+backup_nextcloud()
+{
+    sync
+    log "\n\nRsyncing files from Nextcloud to Backup subvolumes."
+    $RSYNC_CMD -Aaz --stats --delete "${DOCKERDATA}/nextcloud/" "$DOCKERDATA_BKP_DIR/nextcloud_test" &>> $LOGFILE
+    sync
+}
+
 snapshot_all()
 {
     log "\n\nCreate snapshots of all subvolumes..."
@@ -554,6 +562,10 @@ case $1 in
     backup-dockerdata)
         EMAIL=false
         backup_dockerdata
+        ;;
+    backup-nextcloud)
+        EMAIL=false
+        backup_nextcloud
         ;;
     test)
         DRYRUN=true
