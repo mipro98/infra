@@ -238,7 +238,7 @@ backup_nextcloud()
 {
     sync
     log "\n\nRsyncing files from Nextcloud to Backup subvolumes."
-    $RSYNC_CMD -Aaz --stats --delete "${DOCKERDATA}/nextcloud/" "$DOCKERDATA_BKP_DIR/nextcloud_test" &>> $LOGFILE
+    $RSYNC_CMD -Aaz --stats --delete "${DOCKERDATA}/nextcloud/" "$DOCKERDATA_BKP_DIR/nextcloud" &>> $LOGFILE
     sync
 }
 
