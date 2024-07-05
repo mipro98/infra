@@ -105,11 +105,15 @@ docker_services:
   # - ulogger
   - owntracks
   - planka
+  - immich
 
 
 # Nextcloud vars
 nextcloud_version: 29-apache
 
+# Immich vars
+# You can pin this to a specific version like "v1.71.0". For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
+immich_version: v1.107.2
 
 # Maintenance vars
 btrbk_config_dir: /etc/btrbk/btrbk.conf

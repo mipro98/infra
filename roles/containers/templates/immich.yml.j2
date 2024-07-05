@@ -1,0 +1,108 @@
+#
+# WARNING: Make sure to use the docker-compose.yml of the current release:
+#
+# https://github.com/immich-app/immich/releases/latest/download/docker-compose.yml
+#
+# The compose file on main may not be compatible with the latest release.
+#
+
+services:
+
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:{{ immich_version }}
+    container_name: immich_server
+    hostname: immich_server
+    restart: always
+
+    # enable HW transcoding for QuickSync
+    devices:
+      - /dev/dri:/dev/dri
+
+    volumes:
+      - "{{ mount_nas_drive }}/Daten/immich:/usr/src/app/upload"
+      - /etc/localtime:/etc/localtime:ro
+
+    ports:
+      - 2283:3001
+
+    environment:  # https://immich.app/docs/install/environment-variables
+      - TZ=Europe/Berlin  # TZ identifier from this list: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+      - REDIS_HOSTNAME=redis-immich  # hostname of redis container
+      - DB_HOSTNAME=immich-db # has to match container hostname
+      - DB_PASSWORD={{ immich_db_password }}
+      - DB_USERNAME=postgres
+      - DB_DATABASE_NAME=immich
+
+    depends_on:
+      - redis-immich
+      - immich-db
+
+    labels:
+      - "traefik.enable=false"
+      - "traefik.http.routers.immich.tls=true"
+      - "traefik.http.routers.immich.rule=Host(`{{ immich_domain }}`)"
+      - "traefik.http.routers.immich.entrypoints=websecure"
+      - "traefik.http.routers.immich.tls.certresolver=letsencrypt"
+      - "traefik.http.services.immich.loadbalancer.server.port=3001"
+
+    networks:
+      - traefik-net
+
+
+  immich-machine-learning:
+    container_name: immich_machine_learning
+    hostname: immich-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:{{ immich_version }}
+    restart: always
+
+    environment:  # copy of server environment
+      - TZ=Europe/Berlin
+      - REDIS_HOSTNAME=redis-immich
+      - DB_HOSTNAME=immich-db
+      - DB_PASSWORD={{ immich_db_password }}
+      - DB_USERNAME=postgres
+      - DB_DATABASE_NAME=immich
+
+    volumes:
+      - ./model-cache:/cache
+
+    networks:
+      - traefik-net
+
+
+  redis-immich:
+    container_name: redis-immich
+    hostname: redis-immich
+    restart: always
+    image: docker.io/redis:6.2-alpine@sha256:328fe6a5822256d065debb36617a8169dbfbd77b797c525288e465f56c1d392b
+    healthcheck:
+      test: redis-cli ping || exit 1
+    networks:
+      - traefik-net
+
+
+  immich-db:
+    container_name: immich-db
+    hostname: immich-db
+    restart: always
+    image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+
+    environment:
+      - POSTGRES_PASSWORD={{ immich_db_password }}
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=immich
+      - POSTGRES_INITDB_ARGS='--data-checksums'
+
+    volumes:
+      - "{{ docker_data_dir }}/immich/db:/var/lib/postgresql/data"
+
+    healthcheck:
+      test: pg_isready --dbname='immich' --username='postgres' || exit 1; Chksum="$$(psql --dbname='immich' --username='postgres' --tuples-only --no-align --command='SELECT COALESCE(SUM(checksum_failures), 0) FROM pg_stat_database')"; echo "checksum failure count is $$Chksum"; [ "$$Chksum" = '0' ] || exit 1
+      interval: 5m
+      start_interval: 30s
+      start_period: 5m
+
+    command: ["postgres", "-c" ,"shared_preload_libraries=vectors.so", "-c", 'search_path="$$user", public, vectors', "-c", "logging_collector=on", "-c", "max_wal_size=2GB", "-c", "shared_buffers=512MB", "-c", "wal_compression=on"]
+
+    networks:
+      - traefik-net

@@ -41,6 +41,10 @@ nextcloud_db_user: MYNEXTCLOUDUSER
 nextcloud_db_user_pw: DBUSERPW
 nextcloud_db_root_pw: DBROOTPW
 
+# Immich
+immich_domain: immich.mydomain.com
+immich_db_password: PASSWORD
+
 # Collabora
 collabora_domain: collabora.mydomain.com
 collabora_user: USER
