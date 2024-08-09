@@ -59,6 +59,8 @@ prometheus_domain: prometheus.mydomain.com
 # Grafana
 grafana_domain: grafana.mydomain.com
 
+# FMD (FindMyDevice)
+fmd_domain: fmd.mydomain.com
 
 # Jellyfin
 jellyfin_domain: jellyfin.mydomain.com

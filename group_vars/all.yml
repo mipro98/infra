@@ -106,6 +106,7 @@ docker_services:
   - owntracks
   - planka
   # - immich
+  - fmd
 
 
 # Nextcloud vars
