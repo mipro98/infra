@@ -16,6 +16,7 @@ extra_packages:
   - btrbk
   - debugedit
   - docker
+  - docker-buildx
   - docker-compose
   - flex
   - fwupd
