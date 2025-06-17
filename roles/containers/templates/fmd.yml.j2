@@ -1,10 +1,10 @@
 services:
     fmd:
         container_name: fmd
-        image: registry.gitlab.com/nulide/findmydeviceserver:v0.5.0
+        image: registry.gitlab.com/fmd-foss/fmd-server:v0.11.0
         volumes:
-          - "{{ docker_data_dir }}/fmd/fmd.sqlite:/fmd/fmd.sqlite"
-          - "{{ docker_data_dir }}/fmd/config.yml:/fmd/config.yml:ro"
+          - "{{ docker_data_dir }}/fmd/db/:/var/lib/fmd-server/db/"
+          - "{{ docker_data_dir }}/fmd/config.yml:/etc/fmd-server/config.yml:ro"
         restart: unless-stopped
         labels:
           - "traefik.enable=true"
