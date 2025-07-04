@@ -41,6 +41,7 @@ services:
       - MYSQL_HOST=nextcloud-db
       - PHP_MEMORY_LIMIT=6G
       - PHP_UPLOAD_LIMIT=6G
+      - APACHE_BODY_LIMIT=0
 
     tmpfs:
       - /tmp:exec,size=6G
