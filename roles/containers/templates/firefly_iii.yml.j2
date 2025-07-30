@@ -54,6 +54,8 @@ services:
     depends_on:
       - app
     env_file: importer.env
+    ports:
+      - '81:8080'
 
     networks:
       - traefik-net
