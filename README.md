@@ -34,6 +34,7 @@ Various configuration can be done using variables defined in `group_vars` or in 
 * [ulogger](https://github.com/bfabiszewski/ulogger-server)
 * [OwnTracks](https://owntracks.org/) ([recorder](https://github.com/owntracks/recorder) + [frontend](https://github.com/owntracks/frontend))
 * [Planka](https://planka.app/)
+* [Firefly III](https://www.firefly-iii.org/)
 * [Traefik v2](https://doc.traefik.io/traefik/) as the central reverse proxy.
 
 **_All these services are setup to be exposed through Traefik on different domains by simply providing domain names for the services in `vault.yml`._**
