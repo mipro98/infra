@@ -80,3 +80,10 @@ planka_secret_key: <secret_key>
 planka_admin_email: plankaadmin@mydomain.com
 planka_admin_username: admin
 
+# Firefly III
+firefly_iii_domain: fireflyiii.mydomain.com
+firefly_iii_email_sender: fireflyiii@mydomain.com
+firefly_iii_email_pass: <email-password>
+firefly_iii_db_password: <db-password>
+firefly_iii_app_key: <random-32-char-key>
+firefly_iii_static_cron_token: <another-random-32-char-key>
