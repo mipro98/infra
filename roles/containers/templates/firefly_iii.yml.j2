@@ -1,0 +1,78 @@
+#
+# The Firefly III Data Importer will ask you for the Firefly III URL and a "Client ID".
+# You can generate the Client ID at http://localhost/profile (after registering)
+# The Firefly III URL is: http://app:8080
+#
+# Other URL's will give 500 | Server Error
+#
+
+services:
+  app:
+    image: fireflyiii/core:latest
+    hostname: firefly_iii_app
+    container_name: firefly_iii_core
+
+    restart: always
+    volumes:
+      - "{{ docker_data_dir }}/firefly_iii/upload:/var/www/html/storage/upload"
+    env_file: app.env
+    depends_on:
+      - db
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.firefly_iii.tls=true"
+      - "traefik.http.routers.firefly_iii.rule=Host(`{{ firefly_iii_domain }}`)"
+      - "traefik.http.routers.firefly_iii.entrypoints=websecure"
+      - "traefik.http.services.firefly_iii.loadbalancer.server.port=8080"
+      - "traefik.http.routers.nextcloud.tls.certresolver=letsencrypt"
+
+    networks:
+      - traefik-net
+
+  db:
+    image: mariadb:lts
+    hostname: firefly_iii_db
+    container_name: firefly_iii_db
+    restart: always
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      - MYSQL_USER=firefly
+      - MYSQL_PASSWORD={{ firefly_iii_db_password }}
+      - MYSQL_DATABASE=firefly
+    volumes:
+      - "{{ docker_data_dir }}/firefly_iii/db:/var/lib/mysql"
+
+    networks:
+      - traefik-net
+
+  importer:
+    image: fireflyiii/data-importer:latest
+    hostname: firefly_iii_importer
+    restart: always
+    container_name: firefly_iii_importer
+    depends_on:
+      - app
+    env_file: importer.env
+
+    networks:
+      - traefik-net
+
+  cron:
+    #
+    # To make this work, set STATIC_CRON_TOKEN in your .env file or as an environment variable and replace PLEASE_REPLACE_WITH_32_CHAR_CODE below
+    # The STATIC_CRON_TOKEN must be *exactly* 32 characters long
+    # Use this URL for inspiration: https://www.random.org/strings/?num=1&len=32&digits=on&upperalpha=on&loweralpha=on&unique=on&format=html&rnd=new
+    #
+    image: alpine
+    container_name: firefly_iii_cron
+    restart: always
+    command: sh -c "
+      apk add tzdata
+      && ln -s /usr/share/zoneinfo/${TZ} /etc/localtime
+      | echo \"0 3 * * * wget -qO- http://firefly_iii_app:8080/api/v1/cron/{{ firefly_iii_static_cron_token }};echo\"
+      | crontab -
+      && crond -f -L /dev/stdout"
+
+    networks:
+      - traefik-net

@@ -1,0 +1,17 @@
+---
+
+- name: Copy app environment file to firefly_iii
+  ansible.builtin.template:
+    src: "firefly_iii_app.env.j2"
+    dest: "{{ docker_compose_dir }}/firefly_iii/app.env"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0644"
+
+- name: Copy importer environment file to firefly_iii
+  ansible.builtin.template:
+    src: "firefly_iii_importer.env.j2"
+    dest: "{{ docker_compose_dir }}/firefly_iii/importer.env"
+    owner: "{{ username }}"
+    group: "{{ unixgroup }}"
+    mode: "0644"

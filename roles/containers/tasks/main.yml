@@ -73,6 +73,10 @@
   include_tasks: nextcloud.yml
   when: '"nextcloud" in docker_services'
 
+- name: include firefly iii setup tasks
+  include_tasks: firefly_iii.yml
+  when: '"firefly_iii" in docker_services'
+
 - name: Ensure the ulogger-server repo is cloned in case ulogger is configured.
   ansible.builtin.git:
     repo: 'https://github.com/bfabiszewski/ulogger-server'
