@@ -108,7 +108,7 @@ docker_services:
   - planka
   # - immich
   - fmd
-  - firefly_iii
+  #- firefly_iii
 
 
 # Nextcloud vars
