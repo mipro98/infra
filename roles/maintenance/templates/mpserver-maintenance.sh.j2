@@ -423,10 +423,21 @@ monthly()
     # send preliminary email before scrubbing
     send_email_with_logs "(PRELIM) "
 
-    scrub "$MOUNT_NAS"
+    scrub "$MOUNT_NAS" &
+    pid_nas=$!
 
     if isMounted "$MOUNT_BKP_DRIVE"; then
-        scrub "$MOUNT_BKP_DRIVE"
+        scrub "$MOUNT_BKP_DRIVE" &
+        pid_bkp=$!
+    else
+        pid_bkp=""
+    fi
+
+    wait "$pid_nas"
+
+    if [[ -n "$pid_bkp" ]]; then
+        wait "$pid_bkp"
+
         # unmount backup drive
         sync
         umount "$MOUNT_BKP_DRIVE"
