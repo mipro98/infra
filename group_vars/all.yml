@@ -108,11 +108,11 @@ docker_services:
   - planka
   # - immich
   - fmd
-  #- firefly_iii
+  # - firefly_iii
 
 
 # Nextcloud vars
-nextcloud_version: 32-apache
+nextcloud_version: 33-apache
 
 # Immich vars
 # You can pin this to a specific version like "v1.71.0". For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
