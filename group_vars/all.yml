@@ -112,7 +112,8 @@ docker_services:
 
 
 # Nextcloud vars
-nextcloud_version: 33-apache
+nextcloud_version: 34-apache
+nextcloud_mariadb_version: 11
 
 # Immich vars
 # You can pin this to a specific version like "v1.71.0". For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.

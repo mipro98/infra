@@ -3,7 +3,7 @@
 services:
 
   nextcloud-db:
-    image: mariadb:11
+    image: mariadb:{{ nextcloud_mariadb_version }}
     container_name: nextcloud-db
     restart: always
     command: --transaction-isolation=READ-COMMITTED --log_bin_trust_function_creators=true --log-bin=binlog --binlog-format=ROW
